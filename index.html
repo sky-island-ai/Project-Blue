@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Blue Tucson Data Center Impact Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --accent-water: #06b6d4;
+            --accent-electric: #f59e0b;
+            --accent-economy: #10b981;
+            --accent-cost: #8b5cf6;
+            --positive: #22c55e;
+            --negative: #ef4444;
+            --warning: #f97316;
+            --danger: #dc2626;
+            --developer-claim: #3b82f6;
+            --comparison-marker: #64748b;
+            --border: #475569;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        header {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+        }
+
+        h1 {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-water));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            cursor: help;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .info-button {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 6px 12px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .info-button:hover {
+            background: var(--border);
+            color: var(--text-primary);
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .slider-section {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+        }
+
+        .slider-section.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .slider-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .slider-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: help;
+        }
+
+        .slider-title h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .icon {
+            font-size: 28px;
+        }
+
+        .consumption-badge {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            transition: all 0.3s;
+            cursor: help;
+            text-align: center;
+            min-width: 200px;
+        }
+
+        .consumption-low {
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--positive);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .consumption-medium {
+            background: rgba(249, 115, 22, 0.2);
+            color: var(--warning);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+        }
+
+        .consumption-high {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--negative);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .water-type-toggle {
+            display: flex;
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 20px;
+        }
+
+        .water-type-option {
+            flex: 1;
+            padding: 8px 16px;
+            border-radius: 6px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .water-type-option.active {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .slider-container {
+            position: relative;
+            margin: 70px 0 20px;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        .comparison-markers {
+            position: absolute;
+            top: -60px;
+            left: 0;
+            right: 0;
+            height: 55px;
+        }
+
+        .marker {
+            position: absolute;
+            transform: translateX(-50%);
+            text-align: center;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .marker:hover {
+            transform: translateX(-50%) translateY(-2px);
+            z-index: 20;
+        }
+
+        .marker-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--comparison-marker);
+            transition: all 0.2s;
+        }
+
+        .marker.developer .marker-dot {
+            background: var(--developer-claim);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .marker-label {
+            white-space: nowrap;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            max-width: 90px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .marker.developer .marker-label {
+            color: var(--developer-claim);
+            font-weight: 700;
+            border-color: var(--developer-claim);
+            max-width: none;
+        }
+
+        .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--bg-card);
+            outline: none;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--text-primary);
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            transition: all 0.2s;
+            position: relative;
+            z-index: 20;
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--text-primary);
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            transition: all 0.2s;
+            border: none;
+            position: relative;
+            z-index: 20;
+        }
+
+        .slider::-moz-range-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+        }
+
+        .slider-value {
+            margin-top: 20px;
+            padding: 16px;
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .value-main {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .value-details {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .hoverable {
+            cursor: help;
+            position: relative;
+            border-bottom: 1px dotted var(--text-muted);
+        }
+
+        .tooltip {
+            position: fixed;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 1000;
+            max-width: 350px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            border: 1px solid var(--border);
+            line-height: 1.6;
+        }
+
+        .tooltip.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .tooltip a {
+            color: var(--accent-water);
+            text-decoration: none;
+        }
+
+        .tooltip a:hover {
+            text-decoration: underline;
+        }
+
+        .tooltip code {
+            background: var(--bg-card);
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+
+        .impact-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .impact-summary {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+        }
+
+        .impact-summary h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            cursor: help;
+        }
+
+        .impact-section {
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .impact-section:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .impact-section h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: help;
+        }
+
+        .cost-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+
+        .cost-label {
+            color: var(--text-secondary);
+            cursor: help;
+        }
+
+        .cost-value {
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            cursor: help;
+        }
+
+        .cost-value.negative {
+            color: var(--negative);
+        }
+
+        .cost-value.positive {
+            color: var(--positive);
+        }
+
+        .cost-value.neutral {
+            color: var(--text-muted);
+        }
+
+        .share-visualization {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+        }
+
+        .share-visualization h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+            cursor: help;
+        }
+
+        .share-item {
+            margin-bottom: 20px;
+        }
+
+        .share-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .share-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: help;
+        }
+
+        .share-percent {
+            font-size: 20px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            cursor: help;
+        }
+
+        .share-bar-container {
+            width: 100%;
+            height: 24px;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            position: relative;
+            overflow: visible;
+            border: 1px solid var(--border);
+        }
+
+        .share-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            min-width: 3px;
+            transition: width 0.5s ease;
+            border-radius: 8px;
+        }
+
+        .share-fill.water {
+            background: linear-gradient(90deg, var(--accent-water), #06b6d4aa);
+        }
+
+        .share-fill.electric {
+            background: linear-gradient(90deg, var(--accent-electric), #f59e0baa);
+        }
+
+        .share-fill.economy {
+            background: linear-gradient(90deg, var(--accent-economy), #10b981aa);
+        }
+
+        .net-impact {
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-card));
+            border-radius: 16px;
+            padding: 32px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+            grid-column: 1 / -1;
+        }
+
+        .net-impact::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .net-impact-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .net-impact h3 {
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            cursor: help;
+        }
+
+        .net-annual {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            cursor: help;
+        }
+
+        .net-annual.positive {
+            color: var(--positive);
+            text-shadow: 0 0 30px rgba(34, 197, 94, 0.5);
+        }
+
+        .net-annual.negative {
+            color: var(--negative);
+            text-shadow: 0 0 30px rgba(239, 68, 68, 0.5);
+        }
+
+        .net-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .construction-section {
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        .construction-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            cursor: help;
+        }
+
+        .construction-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent-economy);
+            font-family: 'JetBrains Mono', monospace;
+            cursor: help;
+        }
+
+        .construction-note {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            cursor: help;
+        }
+
+        .methodology-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .methodology-content {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 32px;
+            border: 1px solid var(--border);
+        }
+
+        .methodology-content h2 {
+            font-size: 24px;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+        }
+
+        .methodology-content h3 {
+            font-size: 18px;
+            margin: 24px 0 12px;
+            color: var(--text-primary);
+        }
+
+        .methodology-content p {
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .methodology-content ul {
+            margin-bottom: 16px;
+            padding-left: 24px;
+            color: var(--text-secondary);
+        }
+
+        .methodology-content li {
+            margin-bottom: 8px;
+        }
+
+        .methodology-content code {
+            background: var(--bg-card);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+        }
+
+        .methodology-content a {
+            color: #60a5fa;
+            text-decoration: underline;
+        }
+
+        .methodology-content a:hover {
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .close-button {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 16px;
+            color: var(--text-primary);
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 24px;
+        }
+
+        .close-button:hover {
+            background: var(--border);
+        }
+
+        footer {
+            text-align: center;
+            padding: 32px;
+            color: var(--text-muted);
+            font-size: 13px;
+            border-top: 1px solid var(--border);
+            margin-top: 48px;
+        }
+
+        footer a {
+            color: var(--accent-water);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid,
+            .impact-grid {
+                grid-template-columns: 1fr;
+            }
+           
+            .net-annual {
+                font-size: 36px;
+            }
+
+            .share-percent {
+                font-size: 18px;
+            }
+
+            .marker-label {
+                font-size: 10px;
+                padding: 1px 4px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            h1 {
+                font-size: 28px;
+            }
+           
+            .container {
+                padding: 16px;
+            }
+           
+            .slider-section,
+            .impact-summary,
+            .share-visualization,
+            header {
+                padding: 20px;
+            }
+
+            .marker {
+                font-size: 9px;
+            }
+
+            .marker-label {
+                max-width: 60px;
+            }
+
+            .comparison-markers {
+                top: -70px;
+                height: 65px;
+            }
+
+            .marker-dot {
+                width: 6px;
+                height: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 data-tooltip="This dashboard calculates the true financial impact of Project Blue on Tucson taxpayers and ratepayers using economic modeling techniques">Project Blue Tucson Data Center Impact Dashboard</h1>
+            <div class="subtitle">
+                <span>Economic impact calculator based on Net Local Impact methodology</span>
+                <button class="info-button" onclick="showMethodology()">ⓘ Methodology & Sources</button>
+            </div>
+        </header>
+
+        <div class="main-grid">
+            <!-- Water Use Section -->
+            <div class="slider-section">
+                <div class="slider-header">
+                    <div class="slider-title" data-tooltip="Water consumption for cooling servers. Data centers require significant water for evaporative cooling in hot climates like Tucson">
+                        <span class="icon">💧</span>
+                        <h2>WATER USE</h2>
+                    </div>
+                    <div class="consumption-badge" id="water-badge" data-tooltip="Percentage of Tucson's total water resources (102,700 acre-feet annually including potable and reclaimed)">0% of Tucson Water Supply</div>
+                </div>
+               
+                <div class="water-type-toggle">
+                    <button class="water-type-option active" onclick="setWaterType('potable')" data-tooltip="Drinking water from groundwater and CAP. Market price: $1,594/AF. Shadow price: $4,500/AF (analyst estimate)">Potable Water</button>
+                    <button class="water-type-option" onclick="setWaterType('reclaimed')" data-tooltip="Treated wastewater suitable for cooling. Market price: $1,037/AF. Shadow price: $1,500/AF (analyst estimate)">Reclaimed Water</button>
+                </div>
+               
+                <div class="slider-container">
+                    <div class="comparison-markers" id="water-markers"></div>
+                    <input type="range" class="slider" id="water-slider" min="-1.6" max="3.5" step="0.1" value="1.0">
+                </div>
+                <div class="slider-value" id="water-value"></div>
+            </div>
+
+            <!-- Electric Use Section -->
+            <div class="slider-section">
+                <div class="slider-header">
+                    <div class="slider-title" data-tooltip="Continuous power draw. Data centers run 24/7/365 at high capacity factors (90%+)">
+                        <span class="icon">⚡</span>
+                        <h2>ELECTRIC USE</h2>
+                    </div>
+                    <div class="consumption-badge" id="electric-badge" data-tooltip="Percentage of TEP's total annual generation (9.21 TWh)">0% of TEP Supply</div>
+                </div>
+                <div class="slider-container">
+                    <div class="comparison-markers" id="electric-markers"></div>
+                    <input type="range" class="slider" id="electric-slider" min="50" max="450" step="5" value="120">
+                </div>
+                <div class="slider-value" id="electric-value"></div>
+            </div>
+
+            <!-- Project Scale Section -->
+            <div class="slider-section">
+                <div class="slider-header">
+                    <div class="slider-title" data-tooltip="Total project spending broken into construction and equipment categories">
+                        <span class="icon">🏗️</span>
+                        <h2>PROJECT SCALE</h2>
+                    </div>
+                </div>
+               
+                <div style="margin-bottom: 24px;">
+                    <h3 style="font-size: 14px; margin-bottom: 12px; color: var(--text-secondary);" data-tooltip="Building construction, site work, infrastructure. Local capture rate ~48.9%">Construction Investment</h3>
+                    <div class="slider-container">
+                        <div class="comparison-markers" id="construction-markers"></div>
+                        <input type="range" class="slider" id="construction-slider" min="1000" max="2500" step="50" value="1200">
+                    </div>
+                    <div class="slider-value" id="construction-value"></div>
+                </div>
+
+                <div>
+                    <h3 style="font-size: 14px; margin-bottom: 12px; color: var(--text-secondary);" data-tooltip="Servers and cooling equipment purchased from outside Tucson. Minimal local economic benefit (~5% capture) but gets 8.7% tax exemption that reduces annual revenue">Equipment Investment</h3>
+                    <div class="slider-container">
+                        <div class="comparison-markers" id="equipment-markers"></div>
+                        <input type="range" class="slider" id="equipment-slider" min="500" max="2500" step="50" value="2400">
+                    </div>
+                    <div class="slider-value" id="equipment-value"></div>
+                </div>
+            </div>
+
+            <!-- Economic Activity Section -->
+            <div class="slider-section">
+                <div class="slider-header">
+                    <div class="slider-title" data-tooltip="Ongoing local economic activity from operations">
+                        <span class="icon">💰</span>
+                        <h2>LOCAL ECONOMIC ACTIVITY</h2>
+                    </div>
+                </div>
+               
+                <div>
+                    <h3 style="font-size: 14px; margin-bottom: 12px; color: var(--text-secondary);" data-tooltip="Direct payroll plus local procurement. Formula: Jobs × Avg Salary + Local Services">Annual Local Spending</h3>
+                    <div class="slider-container">
+                        <div class="comparison-markers" id="economic-markers"></div>
+                        <input type="range" class="slider" id="economic-slider" min="40" max="120" step="5" value="60">
+                    </div>
+                    <div class="slider-value" id="economic-value"></div>
+                </div>
+
+                <div style="margin-top: 24px;">
+                    <h3 style="font-size: 14px; margin-bottom: 12px; color: var(--text-secondary);" data-tooltip="Industrial rate paid to TEP. Currently ~$100/MWh for large users">Electric Rate ($/MWh)</h3>
+                    <div class="slider-container" style="margin: 30px 0 16px;">
+                        <div class="comparison-markers" id="electric-rate-markers"></div>
+                        <input type="range" class="slider" id="electric-rate-slider" min="80" max="140" step="1" value="100">
+                    </div>
+                    <div style="text-align: center; font-size: 16px; font-weight: 600;" id="electric-rate-value">$100</div>
+                </div>
+
+                <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border);">
+                    <h3 style="font-size: 14px; margin-bottom: 12px; color: var(--text-secondary);" data-tooltip="True cost to build new generation capacity. Formula varies by scenario - hover over markers for details. Excludes transmission and permitting costs">Marginal Cost of Power ($/MWh)</h3>
+                    <div class="slider-container" style="margin: 30px 0 16px;">
+                        <div class="comparison-markers" id="marginal-cost-markers"></div>
+                        <input type="range" class="slider" id="marginal-cost-slider" min="140" max="250" step="1" value="180">
+                    </div>
+                    <div style="text-align: center; font-size: 16px; font-weight: 600;" id="marginal-cost-value">$180</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="impact-grid">
+            <div class="impact-summary">
+                <h3 data-tooltip="Detailed breakdown of financial flows between Project Blue and the community">NET LOCAL IMPACT ANALYSIS</h3>
+               
+                <div class="impact-section">
+                    <h4 data-tooltip="Formula: (Tax Revenue) - (Ratepayer Cost)">Electric Impact (Annual)</h4>
+                    <div class="cost-line">
+                        <span class="cost-label" data-tooltip="8.7% combined TPT on electric bills">Taxes on Electric Bill</span>
+                        <span class="cost-value positive" id="electric-tax" data-tooltip="Revenue to state, county, and city">+$0</span>
+                    </div>
+                    <div class="cost-line">
+                        <span class="cost-label" data-tooltip="Formula: (Marginal Cost - Rate Paid) × Annual Usage. When new power plants cost more than data centers pay, the difference gets added to everyone's electric bills">Cost Passed to All TEP Customers</span>
+                        <span class="cost-value negative" id="electric-subsidy" data-tooltip="This amount will be recovered through future rate increases affecting all residential and business customers">-$0</span>
+                    </div>
+                    <div class="cost-line" style="font-weight: 600; margin-top: 8px;">
+                        <span class="cost-label">Net Electric Impact</span>
+                        <span class="cost-value" id="net-electric">$0</span>
+                    </div>
+                </div>
+
+                <div class="impact-section">
+                    <h4 data-tooltip="Formula: (Tax Revenue) - (Shadow Price - Market Price) × Volume">Water Impact (Annual)</h4>
+                    <div class="cost-line">
+                        <span class="cost-label" data-tooltip="2.6% city TPT on water bills">Taxes on Water Bill</span>
+                        <span class="cost-value positive" id="water-tax" data-tooltip="Revenue to City of Tucson only">+$0</span>
+                    </div>
+                    <div class="cost-line">
+                        <span class="cost-label" data-tooltip="Formula: (Economic Value - Utility Rate) × Volume. Economic value includes cost of new supply, opportunity cost of other uses, and drought resilience value">Water's True Economic Cost</span>
+                        <span class="cost-value negative" id="water-resource" data-tooltip="Difference between full economic value and what is actually paid">-$0</span>
+                    </div>
+                    <div class="cost-line" style="font-weight: 600; margin-top: 8px;">
+                        <span class="cost-label">Net Water Impact</span>
+                        <span class="cost-value" id="net-water">$0</span>
+                    </div>
+                </div>
+
+                <div class="impact-section">
+                    <h4 data-tooltip="Tax revenues vs. tax exemptions">Fiscal Impact</h4>
+                    <div class="cost-line">
+                        <span class="cost-label" data-tooltip="8.7% sales tax exemption on all equipment purchases, spread over 20 years (assumes LEED certification for sustainable redevelopment). This is lost revenue that other taxpayers must make up">Equipment Tax Break Cost</span>
+                        <span class="cost-value negative" id="tax-abatement" data-tooltip="Annual cost to public budgets">-$0M/yr</span>
+                    </div>
+                    <div class="cost-line">
+                        <span class="cost-label" data-tooltip="Property tax (0.79%) + other local taxes">Other Tax Revenue</span>
+                        <span class="cost-value positive" id="other-taxes" data-tooltip="Ongoing tax contributions">+$0M/yr</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="share-visualization">
+                <h3 data-tooltip="Project Blue's resource consumption and economic activity as percentage of Tucson totals">SHARE OF LOCAL RESOURCES & ECONOMY</h3>
+               
+                <div class="share-item">
+                    <div class="share-header">
+                        <span class="share-label" data-tooltip="Percentage of Tucson Water's total supply">Water Supply</span>
+                        <span class="share-percent" id="share-water-percent" style="color: var(--accent-water);">0.00%</span>
+                    </div>
+                    <div class="share-bar-container">
+                        <div class="share-fill water" id="share-water-bar"></div>
+                    </div>
+                </div>
+
+                <div class="share-item">
+                    <div class="share-header">
+                        <span class="share-label" data-tooltip="Percentage of TEP's total generation">Electric Supply</span>
+                        <span class="share-percent" id="share-electric-percent" style="color: var(--accent-electric);">0.00%</span>
+                    </div>
+                    <div class="share-bar-container">
+                        <div class="share-fill electric" id="share-electric-bar"></div>
+                    </div>
+                </div>
+
+                <div class="share-item">
+                    <div class="share-header">
+                        <span class="share-label" data-tooltip="Annual economic activity as share of Tucson GDP ($62.2B)">Economic Activity</span>
+                        <span class="share-percent" id="share-economy-percent" style="color: var(--accent-economy);">0.000%</span>
+                    </div>
+                    <div class="share-bar-container">
+                        <div class="share-fill economy" id="share-economy-bar"></div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
+                    <p style="font-size: 13px; color: var(--text-muted); text-align: center; cursor: help;" data-tooltip="This shows the relative scale of Project Blue's resource consumption compared to the community's total capacity">
+                        For every $1,000 of Tucson's economy, Project Blue represents <span id="economy-fraction" style="font-weight: 600;">$0.00</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="impact-grid">
+            <div class="net-impact">
+                <div class="net-impact-content">
+                    <h3 data-tooltip="Sum of all impacts: Electric + Water + Fiscal">NET LOCAL IMPACT</h3>
+                    <div class="net-annual" id="net-annual" data-tooltip="Annual impact on community finances">$0</div>
+                    <div class="net-subtitle">per year (ongoing)</div>
+                   
+                    <div class="construction-section">
+                        <div class="construction-title" data-tooltip="Construction spending × 48.9% local capture rate">Construction Period Benefit</div>
+                        <div class="construction-value" id="construction-total" data-tooltip="One-time economic stimulus">$0M</div>
+                        <div class="construction-note" id="construction-gdp" data-tooltip="Spread over 3 years of construction">0.00% of economy</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            Analysis by <a href="https://www.skyislandai.com/" target="_blank">Sky Island AI</a> •
+            <a href="#" onclick="showMethodology(); return false;">Methodology & Data Sources</a> •
+            Updated December 2024
+        </footer>
+    </div>
+
+    <div class="tooltip" id="tooltip"></div>
+
+    <div class="methodology-modal" id="methodology-modal">
+        <div class="methodology-content">
+            <h2>Methodology & Key Sources</h2>
+           
+            <h3>Core Formula</h3>
+            <p>This dashboard calculates the Net Local Impact (NLI) of Project Blue on the Tucson community using the formula:</p>
+            <p><code>NLI = Net Fiscal Impact + Net Utility Impact (Electric + Water)</code></p>
+           
+            <h3>Electric Impact Model</h3>
+            <p>The electric impact compares what the facility pays for power versus the true marginal cost of providing that power:</p>
+            <p><code>Net Electric = (Electric Bill × 8.7% Tax Rate) - ((Marginal Cost - Rate Paid) × Annual Usage)</code></p>
+            <ul>
+                <li><strong>Price Paid:</strong> $80-140/MWh based on TEP Large General Service rates</li>
+                <li><strong>Marginal Cost:</strong> $140-250/MWh - Based on <a href="https://www.lazard.com/media/nltb551p/lazards-lcoeplus-april-2023.pdf" target="_blank" style="color: #60a5fa;">Lazard LCOE Analysis</a> showing:
+                    <ul>
+                        <li>Solar: $24-96/MWh (unsubsidized)</li>
+                        <li>Battery Storage (4-hour): $200-257/MWh (unsubsidized)</li>
+                        <li>Gas Peaker: $115-221/MWh</li>
+                    </ul>
+                </li>
+                <li><strong>Calculation Examples:</strong>
+                    <ul>
+                        <li>Optimistic: 70% solar @ $40/MWh + 20% battery @ $200/MWh + 10% gas @ $150/MWh = $143/MWh</li>
+                        <li>Realistic: 50% solar @ $40/MWh + 30% battery @ $220/MWh + 20% gas @ $180/MWh = $182/MWh</li>
+                        <li>Conservative: 30% solar @ $40/MWh + 40% battery @ $240/MWh + 30% gas @ $200/MWh = $228/MWh</li>
+                    </ul>
+                </li>
+                <li><strong>Important Note:</strong> These marginal cost estimates exclude network upgrades, transmission costs, permitting costs, and environmental compliance costs</li>
+                <li><strong>Tax Rate:</strong> 8.7% combined TPT (5.6% state + 2.6% city + 0.5% county)</li>
+            </ul>
+           
+            <h3>Water Impact Model</h3>
+            <p>The water impact uses a "shadow price" methodology to capture the true economic value of water:</p>
+            <p><code>Net Water = (Water Bill × 2.6% Tax Rate) - ((Shadow Price - Market Price) × Annual Usage)</code></p>
+            <ul>
+                <li><strong>Potable Water Price:</strong> $1,594.30/AF (<a href="https://www.tucsonaz.gov/Departments/Tucson-Water" target="_blank" style="color: #60a5fa;">Tucson Water</a> base industrial rate - excludes summer surcharges)</li>
+                <li><strong>Potable Shadow Price:</strong> $4,500/AF (analyst assumption based on: $800/AF new supply cost + $700/AF opportunity cost + $3,000/AF drought resilience value)</li>
+                <li><strong>Reclaimed Water Price:</strong> $1,036.73/AF (official purple pipe rate - subject to annual escalation)</li>
+                <li><strong>Reclaimed Shadow Price:</strong> $1,500/AF (analyst assumption based on marginal cost to expand reclaimed system)</li>
+                <li><strong>Tax Rate:</strong> 2.6% (City of Tucson TPT only)</li>
+            </ul>
+           
+            <h3>Construction vs. Equipment</h3>
+            <ul>
+                <li><strong>Construction:</strong> Building the facility creates local jobs and procurement. ~48.9% stays in the local economy as wages and materials</li>
+                <li><strong>Equipment:</strong> Servers and cooling systems get an 8.7% tax exemption under <a href="https://www.azleg.gov/ars/41/01519.htm" target="_blank" style="color: #60a5fa;">Arizona's CDC program</a> for 20 years when the project qualifies as a "sustainable redevelopment project" through LEED or similar green building certification</li>
+                <li><strong>Note:</strong> Both Google and Meta build their data centers to LEED Gold standards or higher, qualifying them for the 20-year exemption period</li>
+                <li><strong>Property Tax:</strong> 0.79% effective rate (Tucson median)</li>
+            </ul>
+           
+            <h3>Key Data Sources</h3>
+            <ul>
+                <li><a href="https://www.tep.com/2023-irp/" target="_blank" style="color: #60a5fa;">TEP 2023 Integrated Resource Plan</a></li>
+                <li><a href="https://www.tep.com/2026-rates/" target="_blank" style="color: #60a5fa;">TEP 2026 Rate Case Filing</a></li>
+                <li><a href="https://tucsononewater.com/wp-content/uploads/2023/10/Tucson-Water-One-Water-2100-Plan_Spreads_Web-Version.pdf" target="_blank" style="color: #60a5fa;">Tucson Water One Water 2100 Plan</a></li>
+                <li><a href="https://www.lazard.com/media/nltb551p/lazards-lcoeplus-april-2023.pdf" target="_blank" style="color: #60a5fa;">Lazard LCOE Analysis 2023</a></li>
+                <li><a href="https://www.azleg.gov/ars/41/01519.htm" target="_blank" style="color: #60a5fa;">Arizona Rev. Stat. § 41-1519</a> (CDC Program)</li>
+                <li><a href="https://sustainability.atmeta.com/wp-content/uploads/2024/08/Meta-2024-Sustainability-Report.pdf" target="_blank" style="color: #60a5fa;">Meta 2024 Sustainability Report</a></li>
+                <li><a href="https://www.gstatic.com/gumdrop/sustainability/google-2023-environmental-report.pdf" target="_blank" style="color: #60a5fa;">Google 2023 Environmental Report</a></li>
+            </ul>
+           
+            <button class="close-button" onclick="hideMethodology()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Configuration with real Tucson data
+        const CONFIG = {
+            // Water comparisons (in MGD)
+            comparisons: {
+                water: [
+                    { label: "Project Blue", value: -0.1, type: "developer",
+                      tooltip: "Project Blue claims to be 'water positive', meaning it would return more water to the environment than it uses. However, they have not yet selected a specific method or water replenishment project."},
+                    { label: "Mesa Google", value: 1, type: "benchmark",
+                      tooltip: "Guaranteed allowance at Google's Mesa campus",
+                      source: "https://time.com/5814276/google-data-centers-water/" },
+                    { label: "Large Campus", value: 4, type: "benchmark",
+                      tooltip: "Maximum allowance at Google's Mesa campus",
+                      source: "https://time.com/5814276/google-data-centers-water/" }
+                ],
+                electric: [
+                    { label: "Typical", value: 114, type: "benchmark",
+                      tooltip: "Typical mature campus usage (1 TWh/yr)",
+                      source: "https://sustainability.atmeta.com/wp-content/uploads/2024/08/Meta-2024-Sustainability-Report.pdf" },
+                      { label: "Iowa Google", value: 407, type: "benchmark",
+                      tooltip: "Google built 407 MW (3.6 TWh/yr) of wind power for its Iowa campus",
+                      source: "https://worldstopdatacenters.com/google-council-bluffs-iowa/" },
+                      { label: "Mesa Meta", value: 450, type: "benchmark",
+                      tooltip: "Meta built 450 MW (3.9 TWh/yr) of solar power for its Mesa campus",
+                      source: "https://www.azcentral.com/story/money/business/tech/2025/01/31/meta-says-1-billion-data-center-in-mesa-is-sustainable/78031156007/" }
+                ],
+                construction: [
+                    { label: "Low", value: 1000, type: "benchmark",
+                      tooltip: "Small facility construction" },
+                    { label: "Project Blue", value: 1200, type: "developer",
+                      tooltip: "Developer claim: $1.2B construction investment" },
+                    { label: "Typical", value: 2020, type: "median",
+                      tooltip: "Industry typical for 2.25M sq ft" },
+                    { label: "High", value: 2500, type: "benchmark",
+                      tooltip: "Premium construction" }
+                ],
+                equipment: [
+                    { label: "Min", value: 500, type: "benchmark" },
+                    { label: "Typical", value: 1000, type: "median" },
+                    { label: "High", value: 2000, type: "benchmark" },
+                    { label: "Project Blue", value: 2400, type: "developer",
+                      tooltip: "Developer claim: $2.4B equipment over 3 years" }
+                ],
+                economic: [
+                    { label: "Min", value: 45, type: "benchmark",
+                      tooltip: "Contractual minimum: 75 jobs @ $75k" },
+                    { label: "Project Blue", value: 60, type: "developer",
+                      tooltip: "Developer claim: 180 jobs @ $64k average" },
+                    { label: "High", value: 85, type: "benchmark",
+                      tooltip: "Best case scenario" }
+                ],
+                electricRate: [
+                    { label: "Discounted", value: 90, type: "benchmark",
+                      tooltip: "Special economic development rate sometimes offered to attract large users" },
+                    { label: "Current", value: 100, type: "median",
+                      tooltip: "TEP Large General Service rate for high load factor industrial customers" },
+                    { label: "Future", value: 120, type: "benchmark",
+                      tooltip: "Potential rate after TEP's proposed 14% increase and future adjustments" }
+                ],
+                marginalCost: [
+                    { label: "Optimistic", value: 143, type: "benchmark",
+                      tooltip: "Best case: 70% solar @ $40/MWh + 20% battery @ $200/MWh + 10% gas @ $150/MWh = $143/MWh",
+                      source: "Based on Lazard LCOE 2023" },
+                    { label: "Realistic", value: 182, type: "median",
+                      tooltip: "Expected: 50% solar @ $40/MWh + 30% battery @ $220/MWh + 20% gas @ $180/MWh = $182/MWh",
+                      source: "TEP 2023 IRP resource mix for reliability" },
+                    { label: "Conservative", value: 228, type: "benchmark",
+                      tooltip: "Worst case: 30% solar @ $40/MWh + 40% battery @ $240/MWh + 30% gas @ $200/MWh = $228/MWh",
+                      source: "Higher battery/gas needs for 24/7 reliability" }
+                ]
+            },
+           
+            // Economic parameters
+            rates: {
+                electricTax: 0.087,  // 8.7% combined TPT
+                waterTax: 0.026,     // 2.6% city only
+                waterPricePotable: 1594.30,    // $/AF (base rate, excludes summer surcharges)
+                waterPriceReclaimed: 1036.73,  // $/AF (official rate)
+                waterShadowPotable: 4500,   // $/AF (analyst assumption)
+                waterShadowReclaimed: 1500, // $/AF (analyst assumption)
+                propertyTaxRate: 0.0079,    // 0.79% Tucson median
+                localCaptureRate: 0.489,    // 48.9% for construction
+                cdcTermYears: 20           // Equipment exemption term for sustainable projects
+            },
+           
+            tucsonGDP: 62.2, // billion dollars
+            tucsonWaterTotal: 102700, // AF/year (includes potable + reclaimed)
+            tepTotal: 9.21  // TWh/year
+        };
+
+        let currentWaterType = 'potable';
+        let tooltip = document.getElementById('tooltip');
+        let tooltipTimeout;
+
+        // Initialize all hover handlers
+        function initializeTooltips() {
+            document.querySelectorAll('[data-tooltip]').forEach(element => {
+                element.addEventListener('mouseenter', (e) => {
+                    showTooltip(e, e.target.dataset.tooltip);
+                });
+                element.addEventListener('mouseleave', hideTooltip);
+            });
+        }
+
+        function showTooltip(event, content) {
+            clearTimeout(tooltipTimeout);
+            tooltip.innerHTML = content;
+            tooltip.classList.add('show');
+           
+            const rect = event.target.getBoundingClientRect();
+            const tooltipRect = tooltip.getBoundingClientRect();
+           
+            let x = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+            let y = rect.top - tooltipRect.height - 10;
+           
+            // Keep tooltip on screen
+            if (x < 10) x = 10;
+            if (x + tooltipRect.width > window.innerWidth - 10) {
+                x = window.innerWidth - tooltipRect.width - 10;
+            }
+            if (y < 10) {
+                y = rect.bottom + 10;
+            }
+           
+            tooltip.style.left = x + 'px';
+            tooltip.style.top = y + 'px';
+        }
+
+        function hideTooltip(event) {
+            if (event.relatedTarget && tooltip.contains(event.relatedTarget)) {
+                return;
+            }
+            tooltipTimeout = setTimeout(() => {
+                tooltip.classList.remove('show');
+            }, 100);
+        }
+
+        // Keep tooltip open when hovering over it
+        tooltip.addEventListener('mouseenter', () => {
+            clearTimeout(tooltipTimeout);
+        });
+
+        tooltip.addEventListener('mouseleave', () => {
+            tooltip.classList.remove('show');
+        });
+
+        function setWaterType(type) {
+            currentWaterType = type;
+            document.querySelectorAll('.water-type-option').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            updateAll();
+        }
+
+        function createMarkers(containerId, comparisons, currentValue, range) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+           
+            container.innerHTML = '';
+           
+            comparisons.forEach(comp => {
+                const marker = document.createElement('div');
+                marker.className = 'marker' + (comp.type === 'developer' ? ' developer' : '');
+                const position = ((comp.value - range.min) / (range.max - range.min)) * 100;
+                marker.style.left = position + '%';
+               
+                const dot = document.createElement('div');
+                dot.className = 'marker-dot';
+               
+                const label = document.createElement('div');
+                label.className = 'marker-label';
+                label.textContent = comp.label;
+               
+                marker.appendChild(dot);
+                marker.appendChild(label);
+               
+                if (comp.tooltip || comp.source) {
+                    marker.addEventListener('mouseenter', (e) => {
+                        let tooltipContent = `<strong>${comp.label}</strong><br>${comp.tooltip || ''}`;
+                        if (comp.source && comp.source.startsWith('http')) {
+                            tooltipContent += `<br><a href="${comp.source}" target="_blank">Source ↗</a>`;
+                        } else if (comp.source) {
+                            tooltipContent += `<br><em>${comp.source}</em>`;
+                        }
+                        showTooltip(e, tooltipContent);
+                    });
+                    marker.addEventListener('mouseleave', hideTooltip);
+                }
+               
+                marker.addEventListener('click', () => {
+                    const sliderId = containerId.replace('-markers', '-slider');
+                    const slider = document.getElementById(sliderId);
+                    if (slider) {
+                        // Set value and trigger change
+                        slider.value = comp.value;
+                        slider.dispatchEvent(new Event('input', { bubbles: true }));
+                        updateAll();
+                    }
+                });
+               
+                container.appendChild(marker);
+            });
+        }
+
+        function updateConsumptionBadge(badgeId, percent, type) {
+            const badge = document.getElementById(badgeId);
+            const absPercent = Math.abs(percent);
+            const sign = percent < 0 ? '-' : '';
+            badge.textContent = `${sign}${absPercent.toFixed(1)}% of ${type}`;
+           
+            // Special color logic for water badge
+            if (type.includes('Water')) {
+                // Clear classes first
+                badge.className = 'consumption-badge';
+               
+                // Green at -1%, transitioning to dark red at 5%
+                if (percent <= -1) {
+                    badge.style.background = 'rgba(34, 197, 94, 0.2)';
+                    badge.style.color = '#22c55e';
+                    badge.style.border = '1px solid rgba(34, 197, 94, 0.3)';
+                } else if (percent >= 5) {
+                    badge.style.background = 'rgba(127, 29, 29, 0.2)';
+                    badge.style.color = '#7f1d1d';
+                    badge.style.border = '1px solid rgba(127, 29, 29, 0.3)';
+                } else {
+                    // Interpolate between green and dark red
+                    const t = (percent + 1) / 6; // Normalize -1 to 5 range to 0-1
+                    const r = Math.round(34 + (127 - 34) * t);
+                    const g = Math.round(197 - (197 - 29) * t);
+                    const b = Math.round(94 - (94 - 29) * t);
+                    badge.style.background = `rgba(${r}, ${g}, ${b}, 0.2)`;
+                    badge.style.color = `rgb(${r}, ${g}, ${b})`;
+                    badge.style.border = `1px solid rgba(${r}, ${g}, ${b}, 0.3)`;
+                }
+            } else {
+                // Original logic for electric badge
+                // Clear inline styles
+                badge.style.background = '';
+                badge.style.color = '';
+                badge.style.border = '';
+               
+                badge.className = 'consumption-badge';
+                if (absPercent < 5) {
+                    badge.className += ' consumption-low';
+                } else if (absPercent < 15) {
+                    badge.className += ' consumption-medium';
+                } else {
+                    badge.className += ' consumption-high';
+                }
+            }
+        }
+
+        function updateWater() {
+            const mgd = parseFloat(document.getElementById('water-slider').value);
+            const afPerYear = mgd / 0.00089; // Convert MGD to AF/yr
+            const gallonsPerYear = mgd * 365 * 1000000;
+            const households = Math.round(Math.abs(mgd) / 0.0003);
+            const percent = (afPerYear / CONFIG.tucsonWaterTotal * 100);
+           
+            updateConsumptionBadge('water-badge', percent, 'Tucson Water Supply');
+           
+            const waterTypeLabel = currentWaterType === 'potable' ? 'Potable (drinking)' : 'Reclaimed (purple pipe)';
+           
+            // Calculate color for percentage display
+            let percentColor = 'var(--text-muted)';
+            if (percent <= -1) {
+                percentColor = '#22c55e'; // Green
+            } else if (percent >= 5) {
+                percentColor = '#7f1d1d'; // Dark red
+            } else if (percent > 2) {
+                percentColor = 'var(--warning)'; // Orange warning
+            }
+           
+            if (mgd < 0) {
+                document.getElementById('water-value').innerHTML = `
+                    <div class="value-main" style="color: var(--positive);">-${Math.abs(mgd).toFixed(1)} MGD ("water positive")</div>
+                    <div class="value-details">
+                        Project Blue claims to be "water positive", meaning it would return more water to the environment than it uses. However, they have not yet selected a specific method or water replenishment project.<br>
+                        Equivalent to ${households.toLocaleString()} households worth of water<br>
+                        <span style="color: ${percentColor}">
+                            ${Math.abs(percent).toFixed(2)}% addition to Tucson's water resources
+                        </span>
+                    </div>
+                `;
+            } else {
+                document.getElementById('water-value').innerHTML = `
+                    <div class="value-main">${mgd.toFixed(1)} MGD of ${waterTypeLabel} water</div>
+                    <div class="value-details">
+                        Equivalent to ${households.toLocaleString()} households<br>
+                        ${(gallonsPerYear/1000000).toFixed(1)} million gallons annually<br>
+                        <span style="color: ${percentColor}">
+                            ${percent.toFixed(2)}% of Tucson's total water resources
+                        </span>
+                    </div>
+                `;
+            }
+        }
+
+        function updateElectric() {
+            const mw = parseFloat(document.getElementById('electric-slider').value);
+            const twhPerYear = mw * 24 * 365 * 0.9 / 1000000; // 90% capacity factor
+            const mwhPerYear = twhPerYear * 1000000;
+            const households = Math.round(mw * 1000 / 3); // ~3kW per household
+            const percent = (twhPerYear / CONFIG.tepTotal * 100);
+           
+            updateConsumptionBadge('electric-badge', percent, 'TEP Supply');
+           
+            document.getElementById('electric-value').innerHTML = `
+                <div class="value-main">${mw} MW continuous load</div>
+                <div class="value-details">
+                    ${twhPerYear.toFixed(2)} TWh/year (${mwhPerYear.toLocaleString()} MWh)<br>
+                    Powers equivalent of ${households.toLocaleString()} households<br>
+                    <span style="color: ${percent > 20 ? 'var(--danger)' : percent > 10 ? 'var(--warning)' : 'var(--text-muted)'}">
+                        ${percent.toFixed(1)}% of TEP's total generation
+                    </span>
+                </div>
+            `;
+        }
+
+        function updateConstruction() {
+            const value = parseFloat(document.getElementById('construction-slider').value);
+            const localCapture = value * CONFIG.rates.localCaptureRate;
+           
+            document.getElementById('construction-value').innerHTML = `
+                <div class="value-main">$${value.toLocaleString()}M total construction</div>
+                <div class="value-details">
+                    ~$${localCapture.toFixed(0)}M stays local (48.9% capture rate)<br>
+                    Creates ~3,000 construction jobs over 3 years
+                </div>
+            `;
+        }
+
+        function updateEquipment() {
+            const value = parseFloat(document.getElementById('equipment-slider').value);
+            const annualAbatement = value * CONFIG.rates.electricTax / CONFIG.rates.cdcTermYears;
+            const localCapture = value * 0.05; // 5% local capture
+           
+            document.getElementById('equipment-value').innerHTML = `
+                <div class="value-main">$${value.toLocaleString()}M in equipment purchases</div>
+                <div class="value-details">
+                    Only ~$${localCapture.toFixed(0)}M stays local (5% capture - mostly installation labor)<br>
+                    Tax exemption costs Tucson $${annualAbatement.toFixed(1)}M/year for 20 years (LEED certified)
+                </div>
+            `;
+        }
+
+        function updateEconomic() {
+            const value = parseFloat(document.getElementById('economic-slider').value);
+            const jobs = value < 50 ? 75 : 180;
+            const avgSalary = value < 50 ? 75000 : 64000;
+            const payroll = jobs * avgSalary / 1000000;
+            const localServices = value - payroll;
+           
+            document.getElementById('economic-value').innerHTML = `
+                <div class="value-main">$${value}M annual local activity</div>
+                <div class="value-details">
+                    ~${jobs} jobs @ $${avgSalary.toLocaleString()} = $${payroll.toFixed(1)}M payroll<br>
+                    ~$${localServices.toFixed(1)}M in local procurement and services
+                </div>
+            `;
+        }
+
+        function updateRates() {
+            const electricRate = parseFloat(document.getElementById('electric-rate-slider').value);
+            const marginalCost = parseFloat(document.getElementById('marginal-cost-slider').value);
+           
+            document.getElementById('electric-rate-value').textContent = `$${electricRate}`;
+            document.getElementById('marginal-cost-value').textContent = `$${marginalCost}`;
+        }
+
+        function calculateNetLocalImpact() {
+            // Get inputs
+            const waterMGD = parseFloat(document.getElementById('water-slider').value);
+            const waterAF = waterMGD / 0.00089; // Convert MGD to AF/yr
+            const electricMW = parseFloat(document.getElementById('electric-slider').value);
+            const constructionInvestment = parseFloat(document.getElementById('construction-slider').value);
+            const equipmentInvestment = parseFloat(document.getElementById('equipment-slider').value);
+            const localEconomicActivity = parseFloat(document.getElementById('economic-slider').value);
+            const electricRate = parseFloat(document.getElementById('electric-rate-slider').value);
+            const marginalCost = parseFloat(document.getElementById('marginal-cost-slider').value);
+           
+            // Calculate electric impact
+            const mwhPerYear = electricMW * 24 * 365 * 0.9; // 90% capacity factor
+            const electricBill = mwhPerYear * electricRate;
+            const electricTaxRevenue = electricBill * CONFIG.rates.electricTax;
+            const electricSubsidy = Math.max(0, (marginalCost - electricRate) * mwhPerYear);
+            const netElectric = electricTaxRevenue - electricSubsidy;
+           
+            // Calculate water impact
+            const waterPrice = currentWaterType === 'potable' ?
+                CONFIG.rates.waterPricePotable : CONFIG.rates.waterPriceReclaimed;
+            const waterShadow = currentWaterType === 'potable' ?
+                CONFIG.rates.waterShadowPotable : CONFIG.rates.waterShadowReclaimed;
+           
+            // Handle negative water (water positive claim)
+            let waterTaxRevenue, waterResourceCost, netWater;
+            if (waterAF < 0) {
+                // Water positive - they claim they'll add water
+                waterTaxRevenue = 0; // No tax on water they're not using
+                waterResourceCost = Math.abs(waterAF) * waterShadow * -1; // Negative cost = benefit
+                netWater = waterTaxRevenue - waterResourceCost;
+            } else {
+                // Normal water consumption
+                const waterBill = waterAF * waterPrice;
+                waterTaxRevenue = waterBill * CONFIG.rates.waterTax;
+                waterResourceCost = Math.max(0, (waterShadow - waterPrice) * waterAF);
+                netWater = waterTaxRevenue - waterResourceCost;
+            }
+           
+            // Calculate fiscal impact
+            const annualEquipmentAbatement = equipmentInvestment * 1000000 * CONFIG.rates.electricTax / CONFIG.rates.cdcTermYears;
+            const propertyTax = (constructionInvestment + equipmentInvestment) * 1000000 * CONFIG.rates.propertyTaxRate;
+            const otherTaxes = localEconomicActivity * 1000000 * 0.02; // ~2% of economic activity as taxes
+           
+            // Total net impact
+            const netAnnual = netElectric + netWater - annualEquipmentAbatement + propertyTax + otherTaxes;
+           
+            // Construction impact (one-time)
+            const constructionBenefit = constructionInvestment * CONFIG.rates.localCaptureRate;
+           
+            // Update display
+            document.getElementById('electric-tax').textContent = '+$' + (electricTaxRevenue/1000000).toFixed(2) + 'M';
+            document.getElementById('electric-tax').setAttribute('data-tooltip',
+                `Formula: $${electricRate}/MWh × ${mwhPerYear.toLocaleString()} MWh × 8.7% = $${(electricTaxRevenue/1000000).toFixed(2)}M`);
+           
+            document.getElementById('electric-subsidy').textContent = electricSubsidy > 0 ?
+                '-$' + (electricSubsidy/1000000).toFixed(2) + 'M' : '$0';
+            document.getElementById('electric-subsidy').setAttribute('data-tooltip',
+                electricSubsidy > 0 ?
+                `Formula: ($${marginalCost} - $${electricRate})/MWh × ${mwhPerYear.toLocaleString()} MWh = $${(electricSubsidy/1000000).toFixed(2)}M. This will appear in future TEP rate cases` :
+                'No subsidy when rates cover marginal costs');
+           
+            document.getElementById('net-electric').textContent =
+                (netElectric >= 0 ? '+' : '') + '$' + (netElectric/1000000).toFixed(2) + 'M';
+            document.getElementById('net-electric').className = 'cost-value ' +
+                (netElectric >= 0 ? 'positive' : 'negative');
+           
+            // Water display
+            if (waterAF < 0) {
+                document.getElementById('water-tax').textContent = '$0';
+                document.getElementById('water-tax').setAttribute('data-tooltip',
+                    'No water tax revenue when project is water positive');
+               
+                document.getElementById('water-resource').textContent = '+$' + (Math.abs(waterResourceCost)/1000000).toFixed(2) + 'M';
+                document.getElementById('water-resource').setAttribute('data-tooltip',
+                    `If water is added to system: ${Math.abs(waterAF).toFixed(0)} AF × ${waterShadow}/AF = $${(Math.abs(waterResourceCost)/1000000).toFixed(2)}M benefit (Note: Project Blue has not yet selected a specific water replenishment method)`);
+                document.getElementById('water-resource').className = 'cost-value positive';
+            } else {
+                document.getElementById('water-tax').textContent = '+$' + (waterTaxRevenue/1000).toFixed(0) + 'K';
+                document.getElementById('water-tax').setAttribute('data-tooltip',
+                    `Formula: $${waterPrice.toFixed(0)}/AF × ${waterAF.toFixed(0)} AF × 2.6% = $${(waterTaxRevenue/1000).toFixed(0)}K`);
+               
+                document.getElementById('water-resource').textContent = waterResourceCost > 0 ?
+                    '-$' + (waterResourceCost/1000000).toFixed(2) + 'M' : '$0';
+                document.getElementById('water-resource').setAttribute('data-tooltip',
+                    waterResourceCost > 0 ?
+                    `Formula: ($${waterShadow} - $${waterPrice.toFixed(0)})/AF × ${waterAF.toFixed(0)} AF = $${(waterResourceCost/1000000).toFixed(2)}M` :
+                    'No resource cost when price equals shadow value');
+                document.getElementById('water-resource').className = 'cost-value negative';
+            }
+           
+            document.getElementById('net-water').textContent =
+                (netWater >= 0 ? '+' : '') + '$' + (netWater/1000000).toFixed(2) + 'M';
+            document.getElementById('net-water').className = 'cost-value ' +
+                (netWater >= 0 ? 'positive' : 'negative');
+           
+            document.getElementById('tax-abatement').textContent = '-$' + (annualEquipmentAbatement/1000000).toFixed(1) + 'M/yr';
+            document.getElementById('tax-abatement').setAttribute('data-tooltip',
+                `Formula: $${equipmentInvestment}M × 8.7% ÷ 20 years = $${(annualEquipmentAbatement/1000000).toFixed(1)}M/yr (LEED certified sustainable redevelopment)`);
+           
+            document.getElementById('other-taxes').textContent = '+$' + ((propertyTax + otherTaxes)/1000000).toFixed(1) + 'M/yr';
+            document.getElementById('other-taxes').setAttribute('data-tooltip',
+                `Property tax (0.79% of $${constructionInvestment + equipmentInvestment}M) + other local taxes`);
+           
+            // Share visualizations
+            const waterPercent = (waterAF / CONFIG.tucsonWaterTotal * 100);
+            const electricPercent = ((electricMW * 24 * 365 * 0.9 / 1000000) / CONFIG.tepTotal * 100);
+            const economyPercent = (localEconomicActivity / (CONFIG.tucsonGDP * 1000)) * 100;
+           
+            // Water share
+            document.getElementById('share-water-percent').textContent =
+                (waterPercent < 0 ? '-' : '') + Math.abs(waterPercent).toFixed(2) + '%';
+            document.getElementById('share-water-bar').style.width = Math.max(Math.abs(waterPercent), 0.1) + '%';
+           
+            // Electric share
+            document.getElementById('share-electric-percent').textContent = electricPercent.toFixed(2) + '%';
+            document.getElementById('share-electric-bar').style.width = Math.max(electricPercent, 0.1) + '%';
+           
+            // Economy share
+            document.getElementById('share-economy-percent').textContent = economyPercent.toFixed(3) + '%';
+            document.getElementById('share-economy-bar').style.width = Math.max(economyPercent, 0.01) + '%'; // Show actual percentage
+            document.getElementById('economy-fraction').textContent =
+                '$' + (economyPercent * 10).toFixed(2);
+           
+            // Net annual impact
+            const netAnnualEl = document.getElementById('net-annual');
+            netAnnualEl.textContent = (netAnnual >= 0 ? '+' : '') + '$' + (netAnnual/1000000).toFixed(1) + 'M';
+            netAnnualEl.className = 'net-annual ' + (netAnnual >= 0 ? 'positive' : 'negative');
+            netAnnualEl.setAttribute('data-tooltip',
+                `Sum of all annual impacts: Electric + Water + Fiscal = $${(netAnnual/1000000).toFixed(1)}M`);
+           
+            // Construction impact
+            document.getElementById('construction-total').textContent = '+$' + constructionBenefit.toFixed(0) + 'M';
+            document.getElementById('construction-total').setAttribute('data-tooltip',
+                `Formula: $${constructionInvestment}M × 48.9% capture rate = $${constructionBenefit.toFixed(0)}M`);
+           
+            const constructionGDP = (constructionBenefit / (CONFIG.tucsonGDP * 1000)) * 100;
+            document.getElementById('construction-gdp').textContent =
+                constructionGDP.toFixed(2) + '% of economy (over 3 years)';
+           
+            // Reinitialize tooltips for dynamically updated elements
+            initializeTooltips();
+        }
+
+        function updateAll() {
+            updateWater();
+            updateElectric();
+            updateConstruction();
+            updateEquipment();
+            updateEconomic();
+            updateRates();
+            calculateNetLocalImpact();
+        }
+
+        function showMethodology() {
+            document.getElementById('methodology-modal').style.display = 'block';
+        }
+
+        function hideMethodology() {
+            document.getElementById('methodology-modal').style.display = 'none';
+        }
+
+        // Click outside to close modal
+        window.onclick = function(event) {
+            const modal = document.getElementById('methodology-modal');
+            if (event.target == modal) {
+                hideMethodology();
+            }
+        }
+
+        // Initialize
+        createMarkers('water-markers', CONFIG.comparisons.water, 1.0, {min: -0.1, max: 4.0});
+        createMarkers('electric-markers', CONFIG.comparisons.electric, 228, {min: 114, max: 450});
+        createMarkers('construction-markers', CONFIG.comparisons.construction, 1200, {min: 1000, max: 2500});
+        createMarkers('equipment-markers', CONFIG.comparisons.equipment, 2400, {min: 500, max: 2500});
+        createMarkers('economic-markers', CONFIG.comparisons.economic, 60, {min: 40, max: 120});
+        createMarkers('electric-rate-markers', CONFIG.comparisons.electricRate, 100, {min: 80, max: 140});
+        createMarkers('marginal-cost-markers', CONFIG.comparisons.marginalCost, 180, {min: 140, max: 250});
+
+        // Event listeners
+        document.getElementById('water-slider').addEventListener('input', updateAll);
+        document.getElementById('electric-slider').addEventListener('input', updateAll);
+        document.getElementById('construction-slider').addEventListener('input', updateAll);
+        document.getElementById('equipment-slider').addEventListener('input', updateAll);
+        document.getElementById('economic-slider').addEventListener('input', updateAll);
+        document.getElementById('electric-rate-slider').addEventListener('input', updateAll);
+        document.getElementById('marginal-cost-slider').addEventListener('input', updateAll);
+
+        // Prevent text selection on sliders
+        document.querySelectorAll('.slider-container').forEach(container => {
+            container.addEventListener('selectstart', (e) => e.preventDefault());
+        });
+
+        // Initial update
+        updateAll();
+        initializeTooltips();
+    </script>
+</body>
+</html>
