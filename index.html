@@ -798,7 +798,7 @@
                
                 <div class="slider-container">
                     <div class="comparison-markers" id="water-markers"></div>
-                    <input type="range" class="slider" id="water-slider" min="-1.6" max="3.5" step="0.1" value="1.0">
+                    <input type="range" class="slider" id="water-slider" min="-0.1" max="5" step="0.1" value="1.0">
                 </div>
                 <div class="slider-value" id="water-value"></div>
             </div>
@@ -1071,7 +1071,7 @@
             // Water comparisons (in MGD)
             comparisons: {
                 water: [
-                    { label: "Project Blue", value: -0.1, type: "developer",
+                    { label: "Project Blue's Claim", value: -0.1, type: "developer",
                       tooltip: "Project Blue claims to be 'water positive', meaning it would return more water to the environment than it uses. However, they have not yet selected a specific method or water replenishment project."},
                     { label: "Mesa Google", value: 1, type: "benchmark",
                       tooltip: "Guaranteed allowance at Google's Mesa campus",
@@ -1094,7 +1094,7 @@
                 construction: [
                     { label: "Low", value: 1000, type: "benchmark",
                       tooltip: "Small facility construction" },
-                    { label: "Project Blue", value: 1200, type: "developer",
+                    { label: "Project Blue's Claim", value: 1200, type: "developer",
                       tooltip: "Developer claim: $1.2B construction investment" },
                     { label: "Typical", value: 2020, type: "median",
                       tooltip: "Industry typical for 2.25M sq ft" },
@@ -1105,13 +1105,13 @@
                     { label: "Min", value: 500, type: "benchmark" },
                     { label: "Typical", value: 1000, type: "median" },
                     { label: "High", value: 2000, type: "benchmark" },
-                    { label: "Project Blue", value: 2400, type: "developer",
+                    { label: "Project Blue's Claim", value: 2400, type: "developer",
                       tooltip: "Developer claim: $2.4B equipment over 3 years" }
                 ],
                 economic: [
                     { label: "Min", value: 45, type: "benchmark",
                       tooltip: "Contractual minimum: 75 jobs @ $75k" },
-                    { label: "Project Blue", value: 60, type: "developer",
+                    { label: "Project Blue's Claim", value: 60, type: "developer",
                       tooltip: "Developer claim: 180 jobs @ $64k average" },
                     { label: "High", value: 85, type: "benchmark",
                       tooltip: "Best case scenario" }
