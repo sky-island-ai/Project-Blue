@@ -2,14 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Blue Tucson Data Center Impact Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Project Blue Tucson Data Center Campus Impact Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-primary: #0f172a;
             --bg-secondary: #1e293b;
             --bg-card: #334155;
+            --bg-hover: #475569;
             --text-primary: #f1f5f9;
             --text-secondary: #cbd5e1;
             --text-muted: #94a3b8;
@@ -20,10 +21,16 @@
             --positive: #22c55e;
             --negative: #ef4444;
             --warning: #f97316;
-            --danger: #dc2626;
+            --danger: #ff6b6b;
             --developer-claim: #3b82f6;
             --comparison-marker: #64748b;
             --border: #475569;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.2);
+            --shadow-md: 0 4px 24px rgba(0,0,0,0.3);
+            --shadow-lg: 0 8px 32px rgba(0,0,0,0.4);
+            --transition-fast: 0.15s ease;
+            --transition-normal: 0.3s ease;
+            --transition-slow: 0.5s ease;
         }
 
         * {
@@ -38,6 +45,42 @@
             color: var(--text-primary);
             line-height: 1.6;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Loading animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-overlay.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid var(--bg-secondary);
+            border-top-color: var(--accent-water);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         .container {
@@ -45,6 +88,58 @@
             max-width: 1400px;
             margin: 0 auto;
             padding: 24px;
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+            animation-delay: 0.3s;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .attribution {
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text-primary);
+            transform: translateY(-10px);
+            opacity: 0;
+            animation: slideDown 0.5s ease forwards;
+            animation-delay: 0.4s;
+        }
+
+        @keyframes slideDown {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .attribution a {
+            color: var(--accent-water);
+            text-decoration: none;
+            position: relative;
+            transition: color var(--transition-fast);
+        }
+
+        .attribution a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-water);
+            transition: width var(--transition-normal);
+        }
+
+        .attribution a:hover {
+            color: #38bdf8;
+        }
+
+        .attribution a:hover::after {
+            width: 100%;
         }
 
         header {
@@ -52,17 +147,34 @@
             border-radius: 16px;
             padding: 32px;
             margin-bottom: 32px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+            transform: translateY(20px);
+            opacity: 0;
+            animation: slideUp 0.6s ease forwards;
+            animation-delay: 0.5s;
+        }
+
+        @keyframes slideUp {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         h1 {
-            font-size: 36px;
+            font-size: clamp(28px, 4vw, 36px);
             font-weight: 800;
             margin-bottom: 12px;
             background: linear-gradient(135deg, var(--text-primary), var(--accent-water));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             cursor: help;
+            transition: transform var(--transition-fast);
+        }
+
+        h1:hover {
+            transform: translateX(2px);
         }
 
         .subtitle {
@@ -71,6 +183,30 @@
             display: flex;
             align-items: center;
             gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .summary {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            font-size: 14px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--accent-water);
+            opacity: 0.5;
         }
 
         .info-button {
@@ -81,12 +217,94 @@
             color: var(--text-secondary);
             font-size: 14px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all var(--transition-fast);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: var(--bg-hover);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
+        }
+
+        .info-button:hover::before {
+            width: 150%;
+            height: 150%;
         }
 
         .info-button:hover {
-            background: var(--border);
             color: var(--text-primary);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .info-button span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .sticky-share {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg-primary);
+            padding: 24px 0;
+            margin-bottom: 32px;
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+            background: rgba(15, 23, 42, 0.95);
+        }
+
+        .share-row {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .share-metric {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            border-radius: 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            transition: all var(--transition-normal);
+            cursor: help;
+        }
+
+        .share-metric:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--bg-hover);
+        }
+
+        .share-metric-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            line-height: 1.2;
+        }
+
+        .share-metric-value {
+            font-size: clamp(20px, 3vw, 28px);
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            transition: transform var(--transition-fast);
+        }
+
+        .share-metric:hover .share-metric-value {
+            transform: scale(1.05);
         }
 
         .main-grid {
@@ -100,8 +318,22 @@
             background: var(--bg-secondary);
             border-radius: 16px;
             padding: 28px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+            box-shadow: var(--shadow-md);
             border: 1px solid var(--border);
+            transition: all var(--transition-normal);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideUp 0.6s ease forwards;
+        }
+
+        .slider-section:nth-child(1) { animation-delay: 0.6s; }
+        .slider-section:nth-child(2) { animation-delay: 0.7s; }
+        .slider-section:nth-child(3) { animation-delay: 0.8s; }
+        .slider-section:nth-child(4) { animation-delay: 0.9s; }
+
+        .slider-section:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
         }
 
         .slider-section.full-width {
@@ -113,6 +345,8 @@
             align-items: center;
             justify-content: space-between;
             margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
         }
 
         .slider-title {
@@ -120,6 +354,11 @@
             align-items: center;
             gap: 12px;
             cursor: help;
+            transition: transform var(--transition-fast);
+        }
+
+        .slider-title:hover {
+            transform: translateX(2px);
         }
 
         .slider-title h2 {
@@ -130,17 +369,40 @@
 
         .icon {
             font-size: 28px;
+            animation: pulse 2s ease infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
 
         .consumption-badge {
             padding: 8px 16px;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: clamp(14px, 2vw, 16px);
             font-weight: 700;
-            transition: all 0.3s;
+            transition: all var(--transition-normal);
             cursor: help;
             text-align: center;
             min-width: 200px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .consumption-badge::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.6s;
+        }
+
+        .consumption-badge:hover::before {
+            left: 100%;
         }
 
         .consumption-low {
@@ -161,37 +423,9 @@
             border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
-        .water-type-toggle {
-            display: flex;
-            background: var(--bg-card);
-            border-radius: 8px;
-            padding: 4px;
-            margin-bottom: 20px;
-        }
-
-        .water-type-option {
-            flex: 1;
-            padding: 8px 16px;
-            border-radius: 6px;
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .water-type-option.active {
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        }
-
         .slider-container {
             position: relative;
-            margin: 70px 0 20px;
-            /* Horizontal padding will be applied on small screens via media query */
+            margin: 40px 0 60px;
             padding: 0;
             user-select: none;
             -webkit-user-select: none;
@@ -201,10 +435,11 @@
 
         .comparison-markers {
             position: absolute;
-            top: -60px;
+            bottom: -50px;
             left: 0;
             right: 0;
-            height: 55px;
+            height: 45px;
+            z-index: 5;
         }
 
         .marker {
@@ -214,17 +449,18 @@
             font-size: 11px;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s;
-            z-index: 10;
+            transition: all var(--transition-fast);
+            z-index: 5;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 4px;
+            top: 15px;
         }
 
         .marker:hover {
             transform: translateX(-50%) translateY(-2px);
-            z-index: 20;
+            z-index: 10;
         }
 
         .marker-dot {
@@ -232,7 +468,28 @@
             height: 8px;
             border-radius: 50%;
             background: var(--comparison-marker);
-            transition: all 0.2s;
+            transition: all var(--transition-fast);
+            order: -1;
+            position: relative;
+        }
+
+        .marker-dot::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: inherit;
+            opacity: 0.3;
+            transition: all var(--transition-normal);
+        }
+
+        .marker:hover .marker-dot::after {
+            width: 20px;
+            height: 20px;
         }
 
         .marker.developer .marker-dot {
@@ -249,6 +506,13 @@
             max-width: 90px;
             overflow: hidden;
             text-overflow: ellipsis;
+            transition: all var(--transition-fast);
+        }
+
+        .marker:hover .marker-label {
+            max-width: none;
+            z-index: 10;
+            box-shadow: var(--shadow-sm);
         }
 
         .marker.developer .marker-label {
@@ -256,6 +520,10 @@
             font-weight: 700;
             border-color: var(--developer-claim);
             max-width: none;
+            white-space: normal;
+            line-height: 1.2;
+            text-align: center;
+            width: 60px;
         }
 
         .slider {
@@ -267,6 +535,11 @@
             outline: none;
             cursor: pointer;
             position: relative;
+            transition: background var(--transition-fast);
+        }
+
+        .slider:hover {
+            background: var(--bg-hover);
         }
 
         .slider::-webkit-slider-thumb {
@@ -277,15 +550,19 @@
             border-radius: 50%;
             background: var(--text-primary);
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-            transition: all 0.2s;
+            box-shadow: var(--shadow-md);
+            transition: all var(--transition-fast);
             position: relative;
             z-index: 20;
         }
 
         .slider::-webkit-slider-thumb:hover {
             transform: scale(1.1);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .slider::-webkit-slider-thumb:active {
+            transform: scale(0.95);
         }
 
         .slider::-moz-range-thumb {
@@ -294,8 +571,8 @@
             border-radius: 50%;
             background: var(--text-primary);
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-            transition: all 0.2s;
+            box-shadow: var(--shadow-md);
+            transition: all var(--transition-fast);
             border: none;
             position: relative;
             z-index: 20;
@@ -303,7 +580,24 @@
 
         .slider::-moz-range-thumb:hover {
             transform: scale(1.1);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .slider::-moz-range-thumb:active {
+            transform: scale(0.95);
+        }
+
+        /* Touch-friendly mobile adjustments */
+        @media (hover: none) {
+            .slider::-webkit-slider-thumb {
+                width: 36px;
+                height: 36px;
+            }
+           
+            .slider::-moz-range-thumb {
+                width: 36px;
+                height: 36px;
+            }
         }
 
         .slider-value {
@@ -312,6 +606,12 @@
             background: var(--bg-card);
             border-radius: 12px;
             border: 1px solid var(--border);
+            transition: all var(--transition-normal);
+        }
+
+        .slider-value:hover {
+            border-color: var(--bg-hover);
+            box-shadow: var(--shadow-sm);
         }
 
         .value-main {
@@ -342,17 +642,19 @@
             font-size: 13px;
             pointer-events: none;
             opacity: 0;
-            transition: opacity 0.2s;
+            transition: opacity var(--transition-fast);
             z-index: 1000;
             max-width: 350px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            box-shadow: var(--shadow-lg);
             border: 1px solid var(--border);
             line-height: 1.6;
+            transform: scale(0.95);
         }
 
         .tooltip.show {
             opacity: 1;
             pointer-events: auto;
+            transform: scale(1);
         }
 
         .tooltip a {
@@ -382,8 +684,12 @@
             background: var(--bg-secondary);
             border-radius: 16px;
             padding: 28px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+            box-shadow: var(--shadow-md);
             border: 1px solid var(--border);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideUp 0.6s ease forwards;
+            animation-delay: 1s;
         }
 
         .impact-summary h3 {
@@ -398,6 +704,9 @@
             margin-bottom: 24px;
             padding-bottom: 24px;
             border-bottom: 1px solid var(--border);
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+            animation-delay: 1.1s;
         }
 
         .impact-section:last-child {
@@ -422,17 +731,32 @@
             align-items: center;
             padding: 8px 0;
             font-size: 14px;
+            transition: all var(--transition-fast);
+        }
+
+        .cost-line:hover {
+            transform: translateX(2px);
         }
 
         .cost-label {
             color: var(--text-secondary);
             cursor: help;
+            transition: color var(--transition-fast);
+        }
+
+        .cost-line:hover .cost-label {
+            color: var(--text-primary);
         }
 
         .cost-value {
             font-weight: 600;
             font-family: 'JetBrains Mono', monospace;
             cursor: help;
+            transition: transform var(--transition-fast);
+        }
+
+        .cost-line:hover .cost-value {
+            transform: scale(1.05);
         }
 
         .cost-value.negative {
@@ -451,8 +775,12 @@
             background: var(--bg-secondary);
             border-radius: 16px;
             padding: 28px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+            box-shadow: var(--shadow-md);
             border: 1px solid var(--border);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideUp 0.6s ease forwards;
+            animation-delay: 1.1s;
         }
 
         .share-visualization h3 {
@@ -464,7 +792,8 @@
         }
 
         .share-item {
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+            position: relative;
         }
 
         .share-header {
@@ -486,6 +815,11 @@
             font-weight: 700;
             font-family: 'JetBrains Mono', monospace;
             cursor: help;
+            transition: transform var(--transition-fast);
+        }
+
+        .share-item:hover .share-percent {
+            transform: scale(1.1);
         }
 
         .share-bar-container {
@@ -494,8 +828,20 @@
             background: var(--bg-primary);
             border-radius: 8px;
             position: relative;
-            overflow: visible;
+            overflow: hidden;
             border: 1px solid var(--border);
+        }
+
+        .share-bar-container::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border);
+            opacity: 0.5;
+            pointer-events: none;
         }
 
         .share-fill {
@@ -503,9 +849,27 @@
             left: 0;
             top: 0;
             height: 100%;
-            min-width: 3px;
-            transition: width 0.5s ease;
+            min-width: 2px;
+            transition: width var(--transition-slow);
             border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .share-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
         .share-fill.water {
@@ -525,11 +889,15 @@
             border-radius: 16px;
             padding: 32px;
             text-align: center;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            box-shadow: var(--shadow-lg);
             border: 1px solid var(--border);
             position: relative;
             overflow: hidden;
             grid-column: 1 / -1;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideUp 0.6s ease forwards;
+            animation-delay: 1.2s;
         }
 
         .net-impact::before {
@@ -564,11 +932,16 @@
         }
 
         .net-annual {
-            font-size: 48px;
+            font-size: clamp(36px, 6vw, 48px);
             font-weight: 800;
             margin-bottom: 8px;
             font-family: 'JetBrains Mono', monospace;
             cursor: help;
+            transition: transform var(--transition-fast);
+        }
+
+        .net-annual:hover {
+            transform: scale(1.05);
         }
 
         .net-annual.positive {
@@ -592,20 +965,17 @@
             border-top: 1px solid var(--border);
         }
 
-        .construction-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 8px;
-            cursor: help;
-        }
-
         .construction-value {
             font-size: 28px;
             font-weight: 700;
             color: var(--accent-economy);
             font-family: 'JetBrains Mono', monospace;
             cursor: help;
+            transition: transform var(--transition-fast);
+        }
+
+        .construction-value:hover {
+            transform: scale(1.05);
         }
 
         .construction-note {
@@ -626,6 +996,7 @@
             z-index: 2000;
             padding: 40px;
             overflow-y: auto;
+            backdrop-filter: blur(5px);
         }
 
         .methodology-content {
@@ -635,6 +1006,19 @@
             border-radius: 16px;
             padding: 32px;
             border: 1px solid var(--border);
+            box-shadow: var(--shadow-lg);
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .methodology-content h2 {
@@ -663,6 +1047,7 @@
 
         .methodology-content li {
             margin-bottom: 8px;
+            line-height: 1.6;
         }
 
         .methodology-content code {
@@ -676,6 +1061,7 @@
         .methodology-content a {
             color: #60a5fa;
             text-decoration: underline;
+            transition: color var(--transition-fast);
         }
 
         .methodology-content a:hover {
@@ -692,10 +1078,13 @@
             font-size: 14px;
             cursor: pointer;
             margin-top: 24px;
+            transition: all var(--transition-fast);
         }
 
         .close-button:hover {
-            background: var(--border);
+            background: var(--bg-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
         }
 
         footer {
@@ -705,17 +1094,23 @@
             font-size: 13px;
             border-top: 1px solid var(--border);
             margin-top: 48px;
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+            animation-delay: 1.3s;
         }
 
         footer a {
             color: var(--accent-water);
             text-decoration: none;
+            transition: color var(--transition-fast);
         }
 
         footer a:hover {
             text-decoration: underline;
+            color: #38bdf8;
         }
 
+        /* Enhanced mobile styles */
         @media (max-width: 1024px) {
             .main-grid,
             .impact-grid {
@@ -734,11 +1129,20 @@
                 font-size: 10px;
                 padding: 1px 4px;
             }
+
+            .share-row {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .share-metric {
+                width: 100%;
+            }
         }
 
         @media (max-width: 640px) {
             h1 {
-                font-size: 28px;
+                font-size: 24px;
             }
            
             .container {
@@ -760,54 +1164,119 @@
                 max-width: 60px;
             }
 
-            .comparison-markers {
-                top: -70px;
-                height: 65px;
-            }
-
             .marker-dot {
                 width: 6px;
                 height: 6px;
             }
 
-            /* Provide extra horizontal padding inside each slider container so marker labels
-               don't extend beyond the viewport, eliminating the need for horizontal scroll */
-            .slider-container {
-                padding: 0 32px; /* 32px ≈ half of the 60px max-width marker label */
+            .share-metric-value {
+                font-size: 20px;
+            }
+
+            .consumption-badge {
+                min-width: 150px;
+                font-size: 12px;
+            }
+
+            .slider::-webkit-slider-thumb {
+                width: 32px;
+                height: 32px;
+            }
+           
+            .slider::-moz-range-thumb {
+                width: 32px;
+                height: 32px;
             }
         }
+
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            :root {
+                --border: #64748b;
+                --text-muted: #cbd5e1;
+            }
+        }
+
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Focus styles for accessibility */
+        *:focus-visible {
+            outline: 2px solid var(--accent-water);
+            outline-offset: 2px;
+        }
+
+        button:focus-visible,
+        .slider:focus-visible {
+            outline: 2px solid var(--accent-water);
+            outline-offset: 4px;
+        }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/iframe-resizer@5.4.6/js/iframeResizer.contentWindow.min.js"></script>
 </head>
-<script src="https://cdn.jsdelivr.net/npm/iframe-resizer@5.4.6/js/iframeResizer.contentWindow.min.js"></script>
 <body>
+    <div class="loading-overlay" id="loading">
+        <div class="loading-spinner"></div>
+    </div>
+
     <div class="container">
+        <div class="attribution">
+            <strong>Analysis by <a href="https://www.skyislandai.com/" target="_blank">Sky Island AI</a> - Based in Tucson, Arizona</strong>
+        </div>
+
         <header>
-            <h1 data-tooltip="This dashboard calculates the true financial impact of Project Blue on Tucson taxpayers and ratepayers using economic modeling techniques">Project Blue Tucson Data Center Impact Dashboard</h1>
+            <h1 data-tooltip="This dashboard calculates the true financial impact of Project Blue on Tucson taxpayers and ratepayers using economic modeling techniques">Project Blue Tucson Data Center Campus Impact Dashboard</h1>
             <div class="subtitle">
                 <span>Economic impact calculator based on Net Local Impact methodology</span>
-                <button class="info-button" onclick="showMethodology()">ⓘ Methodology & Sources</button>
+                <button class="info-button" onclick="showMethodology()"><span>ⓘ Methodology & Sources</span></button>
+            </div>
+            <div class="summary">
+                Project Blue is a large-scale data center campus proposed by developer Beale Infrastructure for a 290-acre site in the Tucson area, intended for an undisclosed major technology client. The project plans to invest billions in construction and equipment, creating temporary construction jobs and permanent operational jobs, while also funding an 18-mile extension of the reclaimed water system. However, the proposal has drawn significant criticism from local officials and residents over the lack of transparency and the potential strain on local water and energy resources in a desert community.
             </div>
         </header>
+
+        <div class="sticky-share">
+            <h3 style="text-align: center; margin-bottom: 16px; font-size: 18px; font-weight: 700; color: var(--text-primary);">Share of Local Resources & Economy</h3>
+            <div class="share-row">
+                <div class="share-metric">
+                    <div class="share-metric-label">Water Supply</div>
+                    <div class="share-metric-value" id="sticky-water" style="color: var(--accent-water);">0.00%</div>
+                </div>
+                <div class="share-metric">
+                    <div class="share-metric-label">Electric Supply</div>
+                    <div class="share-metric-value" id="sticky-electric" style="color: var(--accent-electric);">0.00%</div>
+                </div>
+                <div class="share-metric">
+                    <div class="share-metric-label">Annual Ongoing Economic Activity</div>
+                    <div class="share-metric-value" id="sticky-economy" style="color: var(--accent-economy);">0.00%</div>
+                </div>
+            </div>
+        </div>
 
         <div class="main-grid">
             <!-- Water Use Section -->
             <div class="slider-section">
                 <div class="slider-header">
-                    <div class="slider-title" data-tooltip="Water consumption for cooling servers. Data centers require significant water for evaporative cooling in hot climates like Tucson">
+                    <div class="slider-title" data-tooltip="Potable water consumption for cooling servers in Million Gallons per Day (MGD). Data centers require significant water for evaporative cooling in hot climates like Tucson">
                         <span class="icon">💧</span>
-                        <h2>WATER USE</h2>
+                        <h2>WATER USE (MGD)</h2>
                     </div>
-                    <div class="consumption-badge" id="water-badge" data-tooltip="Percentage of Tucson's total water resources (102,700 acre-feet annually including potable and reclaimed)">0% of Tucson Water Supply</div>
+                    <div class="consumption-badge" id="water-badge" data-tooltip="Percentage of Tucson's potable water delivery (78.6 MGD in 2024)">0% of Tucson Potable Water</div>
                 </div>
                
-                <div class="water-type-toggle">
-                    <button class="water-type-option active" onclick="setWaterType('potable')" data-tooltip="Drinking water from groundwater and CAP. Market price: $1,594/AF. Shadow price: $4,500/AF (analyst estimate)">Potable Water</button>
-                    <button class="water-type-option" onclick="setWaterType('reclaimed')" data-tooltip="Treated wastewater suitable for cooling. Market price: $1,037/AF. Shadow price: $1,500/AF (analyst estimate)">Reclaimed Water</button>
-                </div>
+                <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin: 16px 0;">
+                    Project Blue will use potable water, claiming an eventual transition to "100% renewable water resources, primarily reclaimed water" via a new 18-mile pipeline on an undisclosed timeline.
+                </p>
                
                 <div class="slider-container">
-                    <div class="comparison-markers" id="water-markers"></div>
                     <input type="range" class="slider" id="water-slider" min="-0.1" max="5" step="0.1" value="1.0">
+                    <div class="comparison-markers" id="water-markers"></div>
                 </div>
                 <div class="slider-value" id="water-value"></div>
             </div>
@@ -822,8 +1291,8 @@
                     <div class="consumption-badge" id="electric-badge" data-tooltip="Percentage of TEP's total annual generation (9.21 TWh)">0% of TEP Supply</div>
                 </div>
                 <div class="slider-container">
+                    <input type="range" class="slider" id="electric-slider" min="50" max="500" step="5" value="228">
                     <div class="comparison-markers" id="electric-markers"></div>
-                    <input type="range" class="slider" id="electric-slider" min="50" max="500" step="5" value="120">
                 </div>
                 <div class="slider-value" id="electric-value"></div>
             </div>
@@ -840,8 +1309,8 @@
                 <div style="margin-bottom: 24px;">
                     <h3 style="font-size: 14px; margin-bottom: 12px; color: var(--text-secondary);" data-tooltip="Building construction, site work, infrastructure. Local capture rate ~48.9%">Construction Investment</h3>
                     <div class="slider-container">
-                        <div class="comparison-markers" id="construction-markers"></div>
                         <input type="range" class="slider" id="construction-slider" min="1000" max="2500" step="50" value="1200">
+                        <div class="comparison-markers" id="construction-markers"></div>
                     </div>
                     <div class="slider-value" id="construction-value"></div>
                 </div>
@@ -849,8 +1318,8 @@
                 <div>
                     <h3 style="font-size: 14px; margin-bottom: 12px; color: var(--text-secondary);" data-tooltip="Servers and cooling equipment purchased from outside Tucson. Minimal local economic benefit (~5% capture) but gets 8.7% tax exemption that reduces annual revenue">Equipment Investment</h3>
                     <div class="slider-container">
-                        <div class="comparison-markers" id="equipment-markers"></div>
                         <input type="range" class="slider" id="equipment-slider" min="500" max="2500" step="50" value="2400">
+                        <div class="comparison-markers" id="equipment-markers"></div>
                     </div>
                     <div class="slider-value" id="equipment-value"></div>
                 </div>
@@ -866,30 +1335,30 @@
                 </div>
                
                 <div>
-                    <h3 style="font-size: 14px; margin-bottom: 12px; color: var(--text-secondary);" data-tooltip="Direct payroll plus local procurement. Formula: Jobs × Avg Salary + Local Services">Annual Local Spending</h3>
+                    <h3 style="font-size: 14px; margin-bottom: 12px; color: var(--text-secondary);" data-tooltip="Direct payroll plus local procurement. Formula: Jobs × Avg Salary + Local Services. Economic multiplier: 1.4x at minimum spending, 2.4x at maximum">Annual Local Spending</h3>
                     <div class="slider-container">
-                        <div class="comparison-markers" id="economic-markers"></div>
                         <input type="range" class="slider" id="economic-slider" min="40" max="120" step="5" value="60">
+                        <div class="comparison-markers" id="economic-markers"></div>
                     </div>
                     <div class="slider-value" id="economic-value"></div>
                 </div>
 
                 <div style="margin-top: 24px;">
-                    <h3 style="font-size: 14px; margin-bottom: 12px; color: var(--text-secondary);" data-tooltip="Industrial rate paid to TEP. Currently ~$100/MWh for large users">Electric Rate ($/MWh)</h3>
-                    <div class="slider-container" style="margin: 30px 0 16px;">
-                        <div class="comparison-markers" id="electric-rate-markers"></div>
+                    <h3 style="font-size: 14px; margin-bottom: 40px; color: var(--text-secondary);" data-tooltip="Industrial rate paid to TEP. Currently ~$100/MWh for large users">Electric Rate ($/MWh)</h3>
+                    <div class="slider-container">
                         <input type="range" class="slider" id="electric-rate-slider" min="80" max="140" step="1" value="100">
+                        <div class="comparison-markers" id="electric-rate-markers" style="z-index: 5;"></div>
                     </div>
-                    <div style="text-align: center; font-size: 16px; font-weight: 600;" id="electric-rate-value">$100</div>
+                    <div style="text-align: center; font-size: 16px; font-weight: 600; margin-top: -40px;" id="electric-rate-value">$100</div>
                 </div>
 
                 <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border);">
-                    <h3 style="font-size: 14px; margin-bottom: 12px; color: var(--text-secondary);" data-tooltip="True cost to build new generation capacity. Formula varies by scenario - hover over markers for details. Excludes transmission and permitting costs">Marginal Cost of Power ($/MWh)</h3>
-                    <div class="slider-container" style="margin: 30px 0 16px;">
-                        <div class="comparison-markers" id="marginal-cost-markers"></div>
+                    <h3 style="font-size: 14px; margin-bottom: 40px; color: var(--text-secondary);" data-tooltip="True cost to build new generation capacity. Formula varies by scenario - hover over markers for details. Excludes transmission and permitting costs">Marginal Cost of Power ($/MWh)</h3>
+                    <div class="slider-container">
                         <input type="range" class="slider" id="marginal-cost-slider" min="140" max="250" step="1" value="180">
+                        <div class="comparison-markers" id="marginal-cost-markers" style="z-index: 5;"></div>
                     </div>
-                    <div style="text-align: center; font-size: 16px; font-weight: 600;" id="marginal-cost-value">$180</div>
+                    <div style="text-align: center; font-size: 16px; font-weight: 600; margin-top: -40px;" id="marginal-cost-value">$180</div>
                 </div>
             </div>
         </div>
@@ -901,7 +1370,7 @@
                 <div class="impact-section">
                     <h4 data-tooltip="Formula: (Tax Revenue) - (Ratepayer Cost)">Electric Impact (Annual)</h4>
                     <div class="cost-line">
-                        <span class="cost-label" data-tooltip="8.7% combined TPT on electric bills">Taxes on Electric Bill</span>
+                        <span class="cost-label" data-tooltip="8.7% combined TPT on all electric revenue">Total Tax Revenue from Electric</span>
                         <span class="cost-value positive" id="electric-tax" data-tooltip="Revenue to state, county, and city">+$0</span>
                     </div>
                     <div class="cost-line">
@@ -915,7 +1384,7 @@
                 </div>
 
                 <div class="impact-section">
-                    <h4 data-tooltip="Formula: (Tax Revenue) - (Shadow Price - Market Price) × Volume">Water Impact (Annual)</h4>
+                    <h4 data-tooltip="Formula: (Tax Revenue) - (Economic Value - Market Price) × Volume">Water Impact (Annual)</h4>
                     <div class="cost-line">
                         <span class="cost-label" data-tooltip="2.6% city TPT on water bills">Taxes on Water Bill</span>
                         <span class="cost-value positive" id="water-tax" data-tooltip="Revenue to City of Tucson only">+$0</span>
@@ -945,6 +1414,9 @@
 
             <div class="share-visualization">
                 <h3 data-tooltip="Project Blue's resource consumption and economic activity as percentage of Tucson totals">SHARE OF LOCAL RESOURCES & ECONOMY</h3>
+                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px; text-align: center;">
+                    Scale: Bars are scaled 2:1 (full bar = 50% of resource)
+                </p>
                
                 <div class="share-item">
                     <div class="share-header">
@@ -953,6 +1425,7 @@
                     </div>
                     <div class="share-bar-container">
                         <div class="share-fill water" id="share-water-bar"></div>
+                        <div style="position: absolute; left: 50%; top: -18px; transform: translateX(-50%); font-size: 10px; color: var(--text-muted);">25%</div>
                     </div>
                 </div>
 
@@ -963,16 +1436,18 @@
                     </div>
                     <div class="share-bar-container">
                         <div class="share-fill electric" id="share-electric-bar"></div>
+                        <div style="position: absolute; left: 50%; top: -18px; transform: translateX(-50%); font-size: 10px; color: var(--text-muted);">25%</div>
                     </div>
                 </div>
 
                 <div class="share-item">
                     <div class="share-header">
-                        <span class="share-label" data-tooltip="Annual economic activity as share of Tucson GDP ($62.2B)">Economic Activity</span>
+                        <span class="share-label" data-tooltip="Annual ongoing economic activity as share of Tucson GDP ($62.2B)">Annual Ongoing Economic Activity</span>
                         <span class="share-percent" id="share-economy-percent" style="color: var(--accent-economy);">0.000%</span>
                     </div>
                     <div class="share-bar-container">
                         <div class="share-fill economy" id="share-economy-bar"></div>
+                <div style="position: absolute; left: 50%; top: -18px; transform: translateX(-50%); font-size: 10px; color: var(--text-muted);">25%</div>
                     </div>
                 </div>
 
@@ -992,7 +1467,7 @@
                     <div class="net-subtitle">per year (ongoing)</div>
                    
                     <div class="construction-section">
-                        <div class="construction-title" data-tooltip="Construction spending × 48.9% local capture rate">Construction Period Benefit</div>
+                        <h3 style="font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-secondary); margin-bottom: 16px; cursor: help;" data-tooltip="Construction spending × 48.9% local capture rate">Construction Period Benefit</h3>
                         <div class="construction-value" id="construction-total" data-tooltip="One-time economic stimulus">$0M</div>
                         <div class="construction-note" id="construction-gdp" data-tooltip="Spread over 3 years of construction">0.00% of economy</div>
                     </div>
@@ -1001,7 +1476,7 @@
         </div>
 
         <footer>
-            Analysis by <a href="https://www.skyislandai.com/" target="_blank">Sky Island AI</a> •
+            Analysis by <a href="https://www.skyislandai.com/" target="_blank" style="font-size: 16px; font-weight: 600; color: #06b6d4;">Sky Island AI</a> •
             <a href="#" onclick="showMethodology(); return false;">Methodology & Data Sources</a> •
             Updated December 2024
         </footer>
@@ -1019,7 +1494,8 @@
            
             <h3>Electric Impact Model</h3>
             <p>The electric impact compares what the facility pays for power versus the true marginal cost of providing that power:</p>
-            <p><code>Net Electric = (Electric Bill × 8.7% Tax Rate) - ((Marginal Cost - Rate Paid) × Annual Usage)</code></p>
+            <p><code>Net Electric = Total Tax Revenue - Ratepayer Cost Passthrough</code></p>
+            <p>Where Total Tax Revenue includes both the tax on what the data center pays plus the tax on any costs passed to ratepayers.</p>
             <ul>
                 <li><strong>Price Paid:</strong> $80-140/MWh based on TEP Large General Service rates</li>
                 <li><strong>Marginal Cost:</strong> $140-250/MWh - Based on <a href="https://www.lazard.com/media/nltb551p/lazards-lcoeplus-april-2023.pdf" target="_blank" style="color: #60a5fa;">Lazard LCOE Analysis</a> showing:
@@ -1041,21 +1517,21 @@
             </ul>
            
             <h3>Water Impact Model</h3>
-            <p>The water impact uses a "shadow price" methodology to capture the true economic value of water:</p>
-            <p><code>Net Water = (Water Bill × 2.6% Tax Rate) - ((Shadow Price - Market Price) × Annual Usage)</code></p>
+            <p>The water impact uses an "economic value" methodology to capture the true economic value of water, measured in Million Gallons per Day (MGD):</p>
+            <p><code>Net Water = (Water Bill × 2.6% Tax Rate) - ((Economic Value - Market Price) × Annual Usage)</code></p>
             <ul>
                 <li><strong>Potable Water Price:</strong> $1,594.30/AF (<a href="https://www.tucsonaz.gov/Departments/Tucson-Water" target="_blank" style="color: #60a5fa;">Tucson Water</a> base industrial rate - excludes summer surcharges)</li>
-                <li><strong>Potable Shadow Price:</strong> $4,500/AF (analyst assumption based on: $800/AF new supply cost + $700/AF opportunity cost + $3,000/AF drought resilience value)</li>
-                <li><strong>Reclaimed Water Price:</strong> $1,036.73/AF (official purple pipe rate - subject to annual escalation)</li>
-                <li><strong>Reclaimed Shadow Price:</strong> $1,500/AF (analyst assumption based on marginal cost to expand reclaimed system)</li>
+                <li><strong>Potable Economic Value:</strong> $4,500/AF (economic modeling assumption based on: $800/AF new supply cost + $700/AF opportunity cost + $3,000/AF drought resilience value)</li>
                 <li><strong>Tax Rate:</strong> 2.6% (City of Tucson TPT only)</li>
+                <li><strong>Water Supply Baseline:</strong> Tucson Water delivered 78.6 MGD of potable water in 2024 (91.6 MGD total including reclaimed)</li>
+                <li><strong>Note:</strong> Project Blue claims they will eventually transition to "100% renewable water resources, primarily reclaimed water" via a new 18-mile pipeline on an undisclosed timeline</li>
             </ul>
            
             <h3>Construction vs. Equipment</h3>
             <ul>
                 <li><strong>Construction:</strong> Building the facility creates local jobs and procurement. ~48.9% stays in the local economy as wages and materials</li>
-                <li><strong>Equipment:</strong> Servers and cooling systems get an 8.7% tax exemption under <a href="https://www.azleg.gov/ars/41/01519.htm" target="_blank" style="color: #60a5fa;">Arizona's CDC program</a> for 20 years when the project qualifies as a "sustainable redevelopment project" through LEED or similar green building certification</li>
-                <li><strong>Note:</strong> Both Google and Meta build their data centers to LEED Gold standards or higher, qualifying them for the 20-year exemption period</li>
+                <li><strong>Equipment:</strong> Servers and cooling systems get an 8.7% tax exemption under <a href="https://www.azleg.gov/ars/41/01519.htm" target="_blank" style="color: #60a5fa;">Arizona's Certified Data Center program</a> for 20 years when the project qualifies as a "sustainable redevelopment project" through LEED or similar green building certification</li>
+                <li><strong>Note:</strong> Both Google and Meta build their data center campuses to LEED Gold standards or higher, qualifying them for the 20-year exemption period</li>
                 <li><strong>Property Tax:</strong> 0.79% effective rate (Tucson median)</li>
             </ul>
            
@@ -1063,11 +1539,14 @@
             <ul>
                 <li><a href="https://www.tep.com/2023-irp/" target="_blank" style="color: #60a5fa;">TEP 2023 Integrated Resource Plan</a></li>
                 <li><a href="https://www.tep.com/2026-rates/" target="_blank" style="color: #60a5fa;">TEP 2026 Rate Case Filing</a></li>
+                <li><a href="https://www.tep.com/our-energy-mix/" target="_blank" style="color: #60a5fa;">TEP Energy Mix (9.21 TWh delivered in 2024)</a></li>
                 <li><a href="https://tucsononewater.com/wp-content/uploads/2023/10/Tucson-Water-One-Water-2100-Plan_Spreads_Web-Version.pdf" target="_blank" style="color: #60a5fa;">Tucson Water One Water 2100 Plan</a></li>
+                <li><a href="https://time.com/5814276/google-data-centers-water/" target="_blank" style="color: #60a5fa;">Google Mesa Campus Water Agreement (1-4 MGD)</a></li>
                 <li><a href="https://www.lazard.com/media/nltb551p/lazards-lcoeplus-april-2023.pdf" target="_blank" style="color: #60a5fa;">Lazard LCOE Analysis 2023</a></li>
-                <li><a href="https://www.azleg.gov/ars/41/01519.htm" target="_blank" style="color: #60a5fa;">Arizona Rev. Stat. § 41-1519</a> (CDC Program)</li>
+                <li><a href="https://www.azleg.gov/ars/41/01519.htm" target="_blank" style="color: #60a5fa;">Arizona Rev. Stat. § 41-1519</a> (Certified Data Center Program)</li>
                 <li><a href="https://sustainability.atmeta.com/wp-content/uploads/2024/08/Meta-2024-Sustainability-Report.pdf" target="_blank" style="color: #60a5fa;">Meta 2024 Sustainability Report</a></li>
                 <li><a href="https://www.gstatic.com/gumdrop/sustainability/google-2023-environmental-report.pdf" target="_blank" style="color: #60a5fa;">Google 2023 Environmental Report</a></li>
+                <li><a href="https://www.azcentral.com/story/money/business/tech/2025/01/31/meta-says-1-billion-data-center-in-mesa-is-sustainable/78031156007/" target="_blank" style="color: #60a5fa;">Meta Mesa Campus (450 MW)</a></li>
             </ul>
            
             <button class="close-button" onclick="hideMethodology()">Close</button>
@@ -1077,11 +1556,11 @@
     <script>
         // Configuration with real Tucson data
         const CONFIG = {
-            // Water comparisons (in MGD)
+            // Water comparisons (in MGD - Million Gallons per Day)
             comparisons: {
                 water: [
                     { label: "Project Blue's Claim", value: -0.1, type: "developer",
-                      tooltip: "Project Blue claims to be 'water positive', meaning it would return more water to the environment than it uses. However, they have not yet selected a specific method or water replenishment project."},
+                      tooltip: "Project Blue claims to be 'water positive', meaning it would return more water to the environment than it uses. However, they have not yet selected a specific method or water replenishment project." },
                     { label: "Mesa Google", value: 1, type: "benchmark",
                       tooltip: "Guaranteed allowance at Google's Mesa campus",
                       source: "https://time.com/5814276/google-data-centers-water/" },
@@ -1093,10 +1572,10 @@
                     { label: "Typical", value: 114, type: "benchmark",
                       tooltip: "Typical mature campus usage (1 TWh/yr)",
                       source: "https://sustainability.atmeta.com/wp-content/uploads/2024/08/Meta-2024-Sustainability-Report.pdf" },
-                      { label: "Iowa Google", value: 407, type: "benchmark",
+                    { label: "Iowa Google", value: 407, type: "benchmark",
                       tooltip: "Google built 407 MW (3.6 TWh/yr) of wind power for its Iowa campus",
                       source: "https://worldstopdatacenters.com/google-council-bluffs-iowa/" },
-                      { label: "Mesa Meta", value: 450, type: "benchmark",
+                    { label: "Mesa Meta", value: 450, type: "benchmark",
                       tooltip: "Meta built 450 MW (3.9 TWh/yr) of solar power for its Mesa campus",
                       source: "https://www.azcentral.com/story/money/business/tech/2025/01/31/meta-says-1-billion-data-center-in-mesa-is-sustainable/78031156007/" }
                 ],
@@ -1119,11 +1598,11 @@
                 ],
                 economic: [
                     { label: "Min", value: 45, type: "benchmark",
-                      tooltip: "Contractual minimum: 75 jobs @ $75k" },
+                      tooltip: "Contractual minimum: 75 jobs @ $75k. Economic multiplier: 1.4x" },
                     { label: "Project Blue's Claim", value: 60, type: "developer",
                       tooltip: "Developer claim: 180 jobs @ $64k average" },
                     { label: "High", value: 85, type: "benchmark",
-                      tooltip: "Best case scenario" }
+                      tooltip: "Best case scenario. Economic multiplier: 2.4x" }
                 ],
                 electricRate: [
                     { label: "Discounted", value: 90, type: "benchmark",
@@ -1151,22 +1630,30 @@
                 electricTax: 0.087,  // 8.7% combined TPT
                 waterTax: 0.026,     // 2.6% city only
                 waterPricePotable: 1594.30,    // $/AF (base rate, excludes summer surcharges)
-                waterPriceReclaimed: 1036.73,  // $/AF (official rate)
-                waterShadowPotable: 4500,   // $/AF (analyst assumption)
-                waterShadowReclaimed: 1500, // $/AF (analyst assumption)
+                waterEconomicValuePotable: 4500,   // $/AF (analyst assumption)
                 propertyTaxRate: 0.0079,    // 0.79% Tucson median
                 localCaptureRate: 0.489,    // 48.9% for construction
                 cdcTermYears: 20           // Equipment exemption term for sustainable projects
             },
            
             tucsonGDP: 62.2, // billion dollars
-            tucsonWaterTotal: 102700, // AF/year (includes potable + reclaimed)
+            tucsonWaterPotable: 78.6, // MGD potable water delivered in 2024
+            tucsonWaterTotal: 91.6, // MGD total including reclaimed
             tepTotal: 9.21  // TWh/year
         };
 
-        let currentWaterType = 'potable';
         let tooltip = document.getElementById('tooltip');
         let tooltipTimeout;
+
+        // Remove loading overlay after content loads
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loading').classList.add('fade-out');
+                setTimeout(() => {
+                    document.getElementById('loading').style.display = 'none';
+                }, 500);
+            }, 500);
+        });
 
         // Initialize all hover handlers
         function initializeTooltips() {
@@ -1220,15 +1707,6 @@
             tooltip.classList.remove('show');
         });
 
-        function setWaterType(type) {
-            currentWaterType = type;
-            document.querySelectorAll('.water-type-option').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            updateAll();
-        }
-
         function createMarkers(containerId, comparisons, currentValue, range) {
             const container = document.getElementById(containerId);
             if (!container) return;
@@ -1240,15 +1718,6 @@
                 marker.className = 'marker' + (comp.type === 'developer' ? ' developer' : '');
                 const position = ((comp.value - range.min) / (range.max - range.min)) * 100;
                 marker.style.left = position + '%';
-               
-                // Adjust transform for edge markers so labels stay within viewport
-                if (comp.value === range.min) {
-                    // Left edge – anchor to left side instead of centering
-                    marker.style.transform = 'translateX(0)';
-                } else if (comp.value === range.max) {
-                    // Right edge – anchor to right side
-                    marker.style.transform = 'translateX(-100%)';
-                }
                
                 const dot = document.createElement('div');
                 dot.className = 'marker-dot';
@@ -1305,15 +1774,15 @@
                     badge.style.color = '#22c55e';
                     badge.style.border = '1px solid rgba(34, 197, 94, 0.3)';
                 } else if (percent >= 5) {
-                    badge.style.background = 'rgba(127, 29, 29, 0.2)';
-                    badge.style.color = '#7f1d1d';
-                    badge.style.border = '1px solid rgba(127, 29, 29, 0.3)';
+                    badge.style.background = 'rgba(239, 68, 68, 0.2)';
+                    badge.style.color = '#ef4444';
+                    badge.style.border = '1px solid rgba(239, 68, 68, 0.3)';
                 } else {
-                    // Interpolate between green and dark red
+                    // Interpolate between green and bright red
                     const t = (percent + 1) / 6; // Normalize -1 to 5 range to 0-1
-                    const r = Math.round(34 + (127 - 34) * t);
-                    const g = Math.round(197 - (197 - 29) * t);
-                    const b = Math.round(94 - (94 - 29) * t);
+                    const r = Math.round(34 + (239 - 34) * t);
+                    const g = Math.round(197 - (197 - 68) * t);
+                    const b = Math.round(94 - (94 - 68) * t);
                     badge.style.background = `rgba(${r}, ${g}, ${b}, 0.2)`;
                     badge.style.color = `rgb(${r}, ${g}, ${b})`;
                     badge.style.border = `1px solid rgba(${r}, ${g}, ${b}, 0.3)`;
@@ -1340,19 +1809,17 @@
             const mgd = parseFloat(document.getElementById('water-slider').value);
             const afPerYear = mgd / 0.00089; // Convert MGD to AF/yr
             const gallonsPerYear = mgd * 365 * 1000000;
-            const households = Math.round(Math.abs(mgd) / 0.0003);
-            const percent = (afPerYear / CONFIG.tucsonWaterTotal * 100);
+            const households = Math.round(Math.abs(mgd) / 0.000185); // ~185 gal per day per household in Tucson and Oro Valley
+            const percent = (mgd / CONFIG.tucsonWaterPotable * 100);
            
-            updateConsumptionBadge('water-badge', percent, 'Tucson Water Supply');
-           
-            const waterTypeLabel = currentWaterType === 'potable' ? 'Potable (drinking)' : 'Reclaimed (purple pipe)';
+            updateConsumptionBadge('water-badge', percent, 'Tucson Potable Water');
            
             // Calculate color for percentage display
             let percentColor = 'var(--text-muted)';
             if (percent <= -1) {
                 percentColor = '#22c55e'; // Green
             } else if (percent >= 5) {
-                percentColor = '#7f1d1d'; // Dark red
+                percentColor = '#ef4444'; // Bright red instead of dark red
             } else if (percent > 2) {
                 percentColor = 'var(--warning)'; // Orange warning
             }
@@ -1364,18 +1831,18 @@
                         Project Blue claims to be "water positive", meaning it would return more water to the environment than it uses. However, they have not yet selected a specific method or water replenishment project.<br>
                         Equivalent to ${households.toLocaleString()} households worth of water<br>
                         <span style="color: ${percentColor}">
-                            ${Math.abs(percent).toFixed(2)}% addition to Tucson's water resources
+                            ${Math.abs(percent).toFixed(2)}% addition to Tucson's potable water
                         </span>
                     </div>
                 `;
             } else {
                 document.getElementById('water-value').innerHTML = `
-                    <div class="value-main">${mgd.toFixed(1)} MGD of ${waterTypeLabel} water</div>
+                    <div class="value-main">${mgd.toFixed(1)} MGD of potable water</div>
                     <div class="value-details">
                         Equivalent to ${households.toLocaleString()} households<br>
                         ${(gallonsPerYear/1000000).toFixed(1)} million gallons annually<br>
                         <span style="color: ${percentColor}">
-                            ${percent.toFixed(2)}% of Tucson's total water resources
+                            ${percent.toFixed(2)}% of Tucson's potable water delivery
                         </span>
                     </div>
                 `;
@@ -1384,9 +1851,9 @@
 
         function updateElectric() {
             const mw = parseFloat(document.getElementById('electric-slider').value);
-            const twhPerYear = mw * 24 * 365 * 0.9 / 1000000; // 90% capacity factor
+            const twhPerYear = mw * 0.00876; // Correct formula: MW * 0.00876 = TWh/yr
             const mwhPerYear = twhPerYear * 1000000;
-            const households = Math.round(mw * 1000 / 3); // ~3kW per household
+            const households = Math.round(mw * 1000 / 1.1); // ~1.1 kW per household
             const percent = (twhPerYear / CONFIG.tepTotal * 100);
            
             updateConsumptionBadge('electric-badge', percent, 'TEP Supply');
@@ -1437,11 +1904,16 @@
             const payroll = jobs * avgSalary / 1000000;
             const localServices = value - payroll;
            
+            // Calculate economic multiplier
+            const multiplier = 1.4 + (value - 40) / (120 - 40) * (2.4 - 1.4);
+            const totalImpact = value * multiplier;
+           
             document.getElementById('economic-value').innerHTML = `
                 <div class="value-main">$${value}M annual local activity</div>
                 <div class="value-details">
                     ~${jobs} jobs @ $${avgSalary.toLocaleString()} = $${payroll.toFixed(1)}M payroll<br>
-                    ~$${localServices.toFixed(1)}M in local procurement and services
+                    ~$${localServices.toFixed(1)}M in local procurement and services<br>
+                    <span style="color: var(--text-muted)">Total economic impact with ${multiplier.toFixed(1)}x multiplier: $${totalImpact.toFixed(1)}M</span>
                 </div>
             `;
         }
@@ -1452,6 +1924,9 @@
            
             document.getElementById('electric-rate-value').textContent = `$${electricRate}`;
             document.getElementById('marginal-cost-value').textContent = `$${marginalCost}`;
+           
+            // Force recalculation when rates change
+            calculateNetLocalImpact();
         }
 
         function calculateNetLocalImpact() {
@@ -1466,30 +1941,36 @@
             const marginalCost = parseFloat(document.getElementById('marginal-cost-slider').value);
            
             // Calculate electric impact
-            const mwhPerYear = electricMW * 24 * 365 * 0.9; // 90% capacity factor
+            const mwhPerYear = electricMW * 0.00876 * 1000000; // MW * 0.00876 = TWh/yr, then convert to MWh
             const electricBill = mwhPerYear * electricRate;
             const electricTaxRevenue = electricBill * CONFIG.rates.electricTax;
-            const electricSubsidy = Math.max(0, (marginalCost - electricRate) * mwhPerYear);
-            const netElectric = electricTaxRevenue - electricSubsidy;
            
-            // Calculate water impact
-            const waterPrice = currentWaterType === 'potable' ?
-                CONFIG.rates.waterPricePotable : CONFIG.rates.waterPriceReclaimed;
-            const waterShadow = currentWaterType === 'potable' ?
-                CONFIG.rates.waterShadowPotable : CONFIG.rates.waterShadowReclaimed;
+            // If marginal cost > rate paid, the difference gets passed to ratepayers who then pay tax on it
+            const costPassthrough = Math.max(0, marginalCost - electricRate) * mwhPerYear;
+            const taxOnPassthrough = costPassthrough * CONFIG.rates.electricTax;
+            const totalElectricTax = electricTaxRevenue + taxOnPassthrough;
+           
+            const electricSubsidy = costPassthrough; // The subsidy is the cost passed to ratepayers
+            const netElectric = totalElectricTax - electricSubsidy;
+           
+            // Calculate water impact - always use potable water
+            const waterPrice = CONFIG.rates.waterPricePotable;
+            const waterEconomicValue = CONFIG.rates.waterEconomicValuePotable;
+           
+            const tucsonWaterPotableAF = CONFIG.tucsonWaterPotable * 365 / 0.00089; // Convert MGD to AF/yr
            
             // Handle negative water (water positive claim)
             let waterTaxRevenue, waterResourceCost, netWater;
             if (waterAF < 0) {
                 // Water positive - they claim they'll add water
                 waterTaxRevenue = 0; // No tax on water they're not using
-                waterResourceCost = Math.abs(waterAF) * waterShadow * -1; // Negative cost = benefit
+                waterResourceCost = Math.abs(waterAF) * waterEconomicValue * -1; // Negative cost = benefit
                 netWater = waterTaxRevenue - waterResourceCost;
             } else {
                 // Normal water consumption
                 const waterBill = waterAF * waterPrice;
                 waterTaxRevenue = waterBill * CONFIG.rates.waterTax;
-                waterResourceCost = Math.max(0, (waterShadow - waterPrice) * waterAF);
+                waterResourceCost = Math.max(0, (waterEconomicValue - waterPrice) * waterAF);
                 netWater = waterTaxRevenue - waterResourceCost;
             }
            
@@ -1505,9 +1986,11 @@
             const constructionBenefit = constructionInvestment * CONFIG.rates.localCaptureRate;
            
             // Update display
-            document.getElementById('electric-tax').textContent = '+$' + (electricTaxRevenue/1000000).toFixed(2) + 'M';
+            document.getElementById('electric-tax').textContent = '+$' + (totalElectricTax/1000000).toFixed(2) + 'M';
             document.getElementById('electric-tax').setAttribute('data-tooltip',
-                `Formula: $${electricRate}/MWh × ${mwhPerYear.toLocaleString()} MWh × 8.7% = $${(electricTaxRevenue/1000000).toFixed(2)}M`);
+                costPassthrough > 0 ?
+                `Rate: $${electricRate}/MWh × ${mwhPerYear.toLocaleString()} MWh × 8.7% = $${(electricTaxRevenue/1000000).toFixed(2)}M direct tax + $${(taxOnPassthrough/1000000).toFixed(2)}M tax on passthrough = $${(totalElectricTax/1000000).toFixed(2)}M total` :
+                `Rate: $${electricRate}/MWh × ${mwhPerYear.toLocaleString()} MWh × 8.7% = $${(electricTaxRevenue/1000000).toFixed(2)}M`);
            
             document.getElementById('electric-subsidy').textContent = electricSubsidy > 0 ?
                 '-$' + (electricSubsidy/1000000).toFixed(2) + 'M' : '$0';
@@ -1529,7 +2012,7 @@
                
                 document.getElementById('water-resource').textContent = '+$' + (Math.abs(waterResourceCost)/1000000).toFixed(2) + 'M';
                 document.getElementById('water-resource').setAttribute('data-tooltip',
-                    `If water is added to system: ${Math.abs(waterAF).toFixed(0)} AF × ${waterShadow}/AF = $${(Math.abs(waterResourceCost)/1000000).toFixed(2)}M benefit (Note: Project Blue has not yet selected a specific water replenishment method)`);
+                    `If water is added to system: ${Math.abs(waterAF).toFixed(0)} AF × $${waterEconomicValue}/AF = $${(Math.abs(waterResourceCost)/1000000).toFixed(2)}M benefit (Note: Project Blue has not yet selected a specific water replenishment method)`);
                 document.getElementById('water-resource').className = 'cost-value positive';
             } else {
                 document.getElementById('water-tax').textContent = '+$' + (waterTaxRevenue/1000).toFixed(0) + 'K';
@@ -1540,8 +2023,8 @@
                     '-$' + (waterResourceCost/1000000).toFixed(2) + 'M' : '$0';
                 document.getElementById('water-resource').setAttribute('data-tooltip',
                     waterResourceCost > 0 ?
-                    `Formula: ($${waterShadow} - $${waterPrice.toFixed(0)})/AF × ${waterAF.toFixed(0)} AF = $${(waterResourceCost/1000000).toFixed(2)}M` :
-                    'No resource cost when price equals shadow value');
+                    `Formula: ($${waterEconomicValue} - $${waterPrice.toFixed(0)})/AF × ${waterAF.toFixed(0)} AF = $${(waterResourceCost/1000000).toFixed(2)}M` :
+                    'No resource cost when price equals economic value');
                 document.getElementById('water-resource').className = 'cost-value negative';
             }
            
@@ -1559,24 +2042,33 @@
                 `Property tax (0.79% of $${constructionInvestment + equipmentInvestment}M) + other local taxes`);
            
             // Share visualizations
-            const waterPercent = (waterAF / CONFIG.tucsonWaterTotal * 100);
-            const electricPercent = ((electricMW * 24 * 365 * 0.9 / 1000000) / CONFIG.tepTotal * 100);
+            const waterPercent = (waterMGD / CONFIG.tucsonWaterPotable * 100);
+            const electricPercent = ((electricMW * 0.00876) / CONFIG.tepTotal * 100);
+           
+            // Economic activity as direct spending only (not including tax revenue)
             const economyPercent = (localEconomicActivity / (CONFIG.tucsonGDP * 1000)) * 100;
            
-            // Water share
+            // Update sticky values at top
+            document.getElementById('sticky-water').textContent =
+                (waterPercent < 0 ? '-' : '') + Math.abs(waterPercent).toFixed(2) + '%';
+            document.getElementById('sticky-electric').textContent = electricPercent.toFixed(2) + '%';
+            document.getElementById('sticky-economy').textContent = economyPercent.toFixed(3) + '%';
+           
+            // Water share - scale to 50% max
             document.getElementById('share-water-percent').textContent =
                 (waterPercent < 0 ? '-' : '') + Math.abs(waterPercent).toFixed(2) + '%';
-            document.getElementById('share-water-bar').style.width = Math.max(Math.abs(waterPercent), 0.1) + '%';
+            document.getElementById('share-water-bar').style.width = Math.min(Math.max(Math.abs(waterPercent) * 2, 0.2), 100) + '%';
            
-            // Electric share
+            // Electric share - scale to 50% max
             document.getElementById('share-electric-percent').textContent = electricPercent.toFixed(2) + '%';
-            document.getElementById('share-electric-bar').style.width = Math.max(electricPercent, 0.1) + '%';
+            document.getElementById('share-electric-bar').style.width = Math.min(Math.max(electricPercent * 2, 0.2), 100) + '%';
            
-            // Economy share
+            // Economy share - use same scaling as water/electric (2:1)
             document.getElementById('share-economy-percent').textContent = economyPercent.toFixed(3) + '%';
-            document.getElementById('share-economy-bar').style.width = Math.max(economyPercent, 0.01) + '%'; // Show actual percentage
-            document.getElementById('economy-fraction').textContent =
-                '$' + (economyPercent * 10).toFixed(2);
+            // Scale: 50% = full bar, so multiply by 2
+            const economyBarWidth = economyPercent * 2;
+            document.getElementById('share-economy-bar').style.width = Math.max(economyBarWidth, 0.2) + '%';
+            document.getElementById('economy-fraction').textContent = '$' + (economyPercent * 10).toFixed(2);
            
             // Net annual impact
             const netAnnualEl = document.getElementById('net-annual');
@@ -1604,16 +2096,24 @@
             updateConstruction();
             updateEquipment();
             updateEconomic();
-            updateRates();
+            // Don't call updateRates here as it causes recursion
+            // Just update the display values
+            const electricRate = parseFloat(document.getElementById('electric-rate-slider').value);
+            const marginalCost = parseFloat(document.getElementById('marginal-cost-slider').value);
+            document.getElementById('electric-rate-value').textContent = `$${electricRate}`;
+            document.getElementById('marginal-cost-value').textContent = `$${marginalCost}`;
+           
             calculateNetLocalImpact();
         }
 
         function showMethodology() {
             document.getElementById('methodology-modal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
         }
 
         function hideMethodology() {
             document.getElementById('methodology-modal').style.display = 'none';
+            document.body.style.overflow = '';
         }
 
         // Click outside to close modal
@@ -1625,8 +2125,8 @@
         }
 
         // Initialize
-        createMarkers('water-markers', CONFIG.comparisons.water, 1.0, {min: -0.1, max: 4.0});
-        createMarkers('electric-markers', CONFIG.comparisons.electric, 228, {min: 114, max: 450});
+        createMarkers('water-markers', CONFIG.comparisons.water, 1.0, {min: -0.1, max: 5});
+        createMarkers('electric-markers', CONFIG.comparisons.electric, 228, {min: 50, max: 500});
         createMarkers('construction-markers', CONFIG.comparisons.construction, 1200, {min: 1000, max: 2500});
         createMarkers('equipment-markers', CONFIG.comparisons.equipment, 2400, {min: 500, max: 2500});
         createMarkers('economic-markers', CONFIG.comparisons.economic, 60, {min: 40, max: 120});
@@ -1650,6 +2150,25 @@
         // Initial update
         updateAll();
         initializeTooltips();
+
+        // Add keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                hideMethodology();
+            }
+        });
+
+        // Add touch support for mobile
+        if ('ontouchstart' in window) {
+            document.querySelectorAll('.slider').forEach(slider => {
+                slider.addEventListener('touchstart', () => {
+                    slider.classList.add('touching');
+                });
+                slider.addEventListener('touchend', () => {
+                    slider.classList.remove('touching');
+                });
+            });
+        }
     </script>
 </body>
 </html>
