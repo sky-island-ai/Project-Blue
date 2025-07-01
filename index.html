@@ -278,13 +278,6 @@
             background: var(--bg-secondary);
             border: 1px solid var(--border);
             transition: all var(--transition-normal);
-            cursor: help;
-        }
-
-        .share-metric:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-            border-color: var(--bg-hover);
         }
 
         .share-metric-label {
@@ -301,10 +294,6 @@
             font-weight: 700;
             font-family: 'JetBrains Mono', monospace;
             transition: transform var(--transition-fast);
-        }
-
-        .share-metric:hover .share-metric-value {
-            transform: scale(1.05);
         }
 
         .main-grid {
@@ -1294,11 +1283,11 @@
                 </div>
                
                 <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin: 16px 0;">
-                    Project Blue will use potable water, claiming an eventual transition to "100% renewable water resources, primarily reclaimed water" via a new 18-mile pipeline on an undisclosed timeline.
+                    Project Blue will use potable water for at least the first 2 years, claiming an eventual transition to "100% renewable water resources, primarily reclaimed water" via a new 18-mile pipeline.
                 </p>
                
                 <div class="slider-container">
-                    <input type="range" class="slider" id="water-slider" min="-0.5" max="4.5" step="0.1" value="1.0">
+                    <input type="range" class="slider" id="water-slider" min="-0.5" max="4.5" step="0.1" value="2.0">
                     <div class="comparison-markers" id="water-markers"></div>
                 </div>
                 <div class="slider-value" id="water-value"></div>
@@ -1378,7 +1367,7 @@
                 <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border);">
                     <h3 style="font-size: 14px; margin-bottom: 40px; color: var(--text-secondary);" data-tooltip="True cost to build new generation capacity. Formula varies by scenario - hover over markers for details. Excludes transmission and permitting costs">Marginal Cost of Power ($/MWh)</h3>
                     <div class="slider-container">
-                        <input type="range" class="slider" id="marginal-cost-slider" min="140" max="250" step="1" value="180">
+                        <input type="range" class="slider" id="marginal-cost-slider" min="140" max="250" step="1" value="182">
                         <div class="comparison-markers" id="marginal-cost-markers" style="z-index: 5;"></div>
                     </div>
                     <div style="text-align: center; font-size: 24px; font-weight: 700; margin-top: -40px; font-family: 'JetBrains Mono', monospace; color: var(--text-primary);" id="marginal-cost-value">$180</div>
@@ -1547,7 +1536,7 @@
                 <li><strong>Potable Economic Value:</strong> $4,500/AF (economic modeling assumption based on: $800/AF new supply cost + $700/AF opportunity cost + $3,000/AF drought resilience value)</li>
                 <li><strong>Tax Rate:</strong> 2.6% (City of Tucson TPT only)</li>
                 <li><strong>Water Supply Baseline:</strong> Tucson Water delivered 78.6 MGD of potable water in 2024 (91.6 MGD total including reclaimed)</li>
-                <li><strong>Note:</strong> Project Blue claims they will eventually transition to "100% renewable water resources, primarily reclaimed water" via a new 18-mile pipeline on an undisclosed timeline</li>
+                <li><strong>Note:</strong> Project Blue will use potable water for at least the first 2 years, claiming an eventual transition to "100% renewable water resources, primarily reclaimed water" via a new 18-mile pipeline.</li>
             </ul>
            
             <h3>Construction vs. Equipment</h3>
@@ -1583,7 +1572,7 @@
             comparisons: {
                 water: [
                     { label: "Developer Claim", value: -0.1, type: "developer",
-                      tooltip: "Project Blue claims to be 'water positive', meaning it would return more water to the environment than it uses. However, they have not yet selected a specific method or water replenishment project." },
+                      tooltip: "Project Blue claims they will transition to being 'water positive', meaning it would return more water to the environment than it uses, after the first 2 years of using potable water. However, they have not yet selected a specific method or water replenishment project." },
                     { label: "Google Mesa (min)", value: 1, type: "benchmark",
                       tooltip: "Guaranteed allowance at Google's Mesa campus",
                       source: "https://time.com/5814276/google-data-centers-water/" },
@@ -1592,10 +1581,10 @@
                       source: "https://time.com/5814276/google-data-centers-water/" }
                 ],
                 electric: [
-                    { label: "Typical", value: 114, type: "benchmark",
+                    { label: "Typical", value: 115, type: "benchmark",
                       tooltip: "Typical mature campus usage (1 TWh/yr)",
                       source: "https://sustainability.atmeta.com/wp-content/uploads/2024/08/Meta-2024-Sustainability-Report.pdf" },
-                    { label: "Google Iowa", value: 407, type: "benchmark",
+                    { label: "Google Iowa", value: 405, type: "benchmark",
                       tooltip: "Google built 407 MW (3.6 TWh/yr) of wind power for its Iowa campus",
                       source: "https://worldstopdatacenters.com/google-council-bluffs-iowa/" },
                     { label: "Meta Mesa", value: 450, type: "benchmark",
@@ -1851,7 +1840,7 @@
                 document.getElementById('water-value').innerHTML = `
                     <div class="value-main" style="color: var(--positive);">-${Math.abs(mgd).toFixed(1)} MGD ("water positive")</div>
                     <div class="value-details">
-                        Project Blue claims to be "water positive", meaning it would return more water to the environment than it uses. However, they have not yet selected a specific method or water replenishment project.<br>
+                        Project Blue claims they will transition to being 'water positive', meaning it would return more water to the environment than it uses, after the first 2 years of using potable water. However, they have not yet selected a specific method or water replenishment project.<br>
                         Equivalent to ${households.toLocaleString()} households worth of water<br>
                         <span style="color: ${percentColor}">
                             ${Math.abs(percent).toFixed(2)}% addition to Tucson's potable water
