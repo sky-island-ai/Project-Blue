@@ -503,7 +503,7 @@
             border-radius: 4px;
             background: var(--bg-card);
             border: 1px solid var(--border);
-            max-width: 90px;
+            max-width: 120px;
             overflow: hidden;
             text-overflow: ellipsis;
             transition: all var(--transition-fast);
@@ -1282,7 +1282,7 @@
                 </p>
                
                 <div class="slider-container">
-                    <input type="range" class="slider" id="water-slider" min="-0.1" max="5" step="0.1" value="1.0">
+                    <input type="range" class="slider" id="water-slider" min="-0.5" max="4.5" step="0.1" value="1.0">
                     <div class="comparison-markers" id="water-markers"></div>
                 </div>
                 <div class="slider-value" id="water-value"></div>
@@ -1568,10 +1568,10 @@
                 water: [
                     { label: "Project Blue's Claim", value: -0.1, type: "developer",
                       tooltip: "Project Blue claims to be 'water positive', meaning it would return more water to the environment than it uses. However, they have not yet selected a specific method or water replenishment project." },
-                    { label: "Mesa Google", value: 1, type: "benchmark",
+                    { label: "Google Mesa (min)", value: 1, type: "benchmark",
                       tooltip: "Guaranteed allowance at Google's Mesa campus",
                       source: "https://time.com/5814276/google-data-centers-water/" },
-                    { label: "Large Campus", value: 4, type: "benchmark",
+                    { label: "Google Mesa (max)", value: 4, type: "benchmark",
                       tooltip: "Maximum allowance at Google's Mesa campus",
                       source: "https://time.com/5814276/google-data-centers-water/" }
                 ],
@@ -1579,10 +1579,10 @@
                     { label: "Typical", value: 114, type: "benchmark",
                       tooltip: "Typical mature campus usage (1 TWh/yr)",
                       source: "https://sustainability.atmeta.com/wp-content/uploads/2024/08/Meta-2024-Sustainability-Report.pdf" },
-                    { label: "Iowa Google", value: 407, type: "benchmark",
+                    { label: "Google Iowa", value: 407, type: "benchmark",
                       tooltip: "Google built 407 MW (3.6 TWh/yr) of wind power for its Iowa campus",
                       source: "https://worldstopdatacenters.com/google-council-bluffs-iowa/" },
-                    { label: "Mesa Meta", value: 450, type: "benchmark",
+                    { label: "Meta Mesa", value: 450, type: "benchmark",
                       tooltip: "Meta built 450 MW (3.9 TWh/yr) of solar power for its Mesa campus",
                       source: "https://www.azcentral.com/story/money/business/tech/2025/01/31/meta-says-1-billion-data-center-in-mesa-is-sustainable/78031156007/" }
                 ],
@@ -2132,7 +2132,7 @@
         }
 
         // Initialize
-        createMarkers('water-markers', CONFIG.comparisons.water, 1.0, {min: -0.1, max: 5});
+        createMarkers('water-markers', CONFIG.comparisons.water, 1.0, {min: -0.5, max: 4.5});
         createMarkers('electric-markers', CONFIG.comparisons.electric, 228, {min: 50, max: 500});
         createMarkers('construction-markers', CONFIG.comparisons.construction, 1200, {min: 1000, max: 2500});
         createMarkers('equipment-markers', CONFIG.comparisons.equipment, 2400, {min: 500, max: 2500});
