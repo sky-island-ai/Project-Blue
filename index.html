@@ -1303,7 +1303,7 @@
                     <div class="consumption-badge" id="electric-badge" data-tooltip="Percentage of TEP's total annual generation (9.21 TWh)">0% of TEP Supply</div>
                 </div>
                 <div class="slider-container">
-                    <input type="range" class="slider" id="electric-slider" min="50" max="500" step="5" value="228">
+                    <input type="range" class="slider" id="electric-slider" min="50" max="500" step="5" value="275">
                     <div class="comparison-markers" id="electric-markers"></div>
                 </div>
                 <div class="slider-value" id="electric-value"></div>
@@ -1321,7 +1321,7 @@
                 <div style="margin-bottom: 24px;">
                     <h3 style="font-size: 14px; margin-bottom: 12px; color: var(--text-secondary);" data-tooltip="Building construction, site work, infrastructure. Local capture rate ~48.9%">Construction Investment</h3>
                     <div class="slider-container">
-                        <input type="range" class="slider" id="construction-slider" min="1000" max="2500" step="50" value="1200">
+                        <input type="range" class="slider" id="construction-slider" min="1000" max="2500" step="50" value="1750">
                         <div class="comparison-markers" id="construction-markers"></div>
                     </div>
                     <div class="slider-value" id="construction-value"></div>
@@ -1330,7 +1330,7 @@
                 <div>
                     <h3 style="font-size: 14px; margin-bottom: 12px; color: var(--text-secondary);" data-tooltip="Servers and cooling equipment purchased from outside Tucson. Local economic benefit during construction (~5% capture for installation) but gets 8.7% tax exemption that reduces annual revenue">Equipment Investment</h3>
                     <div class="slider-container">
-                        <input type="range" class="slider" id="equipment-slider" min="500" max="2500" step="50" value="2400">
+                        <input type="range" class="slider" id="equipment-slider" min="500" max="2500" step="50" value="1500">
                         <div class="comparison-markers" id="equipment-markers"></div>
                     </div>
                     <div class="slider-value" id="equipment-value"></div>
@@ -1349,7 +1349,7 @@
                 <div>
                     <h3 style="font-size: 14px; margin-bottom: 12px; color: var(--text-secondary);" data-tooltip="Direct payroll plus local procurement. Formula: Jobs × Avg Salary + Local Services. Economic multiplier: 1.4x at minimum spending, 2.4x at maximum">Annual Local Spending</h3>
                     <div class="slider-container">
-                        <input type="range" class="slider" id="economic-slider" min="40" max="120" step="5" value="60">
+                        <input type="range" class="slider" id="economic-slider" min="40" max="100" step="5" value="70">
                         <div class="comparison-markers" id="economic-markers"></div>
                     </div>
                     <div class="slider-value" id="economic-value"></div>
@@ -1358,7 +1358,7 @@
                 <div style="margin-top: 24px;">
                     <h3 style="font-size: 14px; margin-bottom: 40px; color: var(--text-secondary);" data-tooltip="Industrial rate paid to TEP. Currently ~$100/MWh for large users">Electric Rate ($/MWh)</h3>
                     <div class="slider-container">
-                        <input type="range" class="slider" id="electric-rate-slider" min="80" max="140" step="1" value="100">
+                        <input type="range" class="slider" id="electric-rate-slider" min="80" max="140" step="1" value="110">
                         <div class="comparison-markers" id="electric-rate-markers" style="z-index: 5;"></div>
                     </div>
                     <div style="text-align: center; font-size: 24px; font-weight: 700; margin-top: -40px; font-family: 'JetBrains Mono', monospace; color: var(--text-primary);" id="electric-rate-value">$100</div>
@@ -1367,7 +1367,7 @@
                 <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border);">
                     <h3 style="font-size: 14px; margin-bottom: 40px; color: var(--text-secondary);" data-tooltip="True cost to build new generation capacity. Formula varies by scenario - hover over markers for details. Excludes transmission and permitting costs">Marginal Cost of Power ($/MWh)</h3>
                     <div class="slider-container">
-                        <input type="range" class="slider" id="marginal-cost-slider" min="140" max="250" step="1" value="182">
+                        <input type="range" class="slider" id="marginal-cost-slider" min="140" max="250" step="1" value="195">
                         <div class="comparison-markers" id="marginal-cost-markers" style="z-index: 5;"></div>
                     </div>
                     <div style="text-align: center; font-size: 24px; font-weight: 700; margin-top: -40px; font-family: 'JetBrains Mono', monospace; color: var(--text-primary);" id="marginal-cost-value">$180</div>
@@ -1917,7 +1917,7 @@
             const localServices = value - payroll;
            
             // Calculate economic multiplier
-            const multiplier = 1.4 + (value - 40) / (120 - 40) * (2.4 - 1.4);
+            const multiplier = 1.4 + (value - 40) / (100 - 40) * (2.4 - 1.4);
             const totalImpact = value * multiplier;
            
             document.getElementById('economic-value').innerHTML = `
@@ -2139,13 +2139,13 @@
         }
 
         // Initialize
-        createMarkers('water-markers', CONFIG.comparisons.water, 1.0, {min: -0.5, max: 4.5});
-        createMarkers('electric-markers', CONFIG.comparisons.electric, 228, {min: 50, max: 500});
-        createMarkers('construction-markers', CONFIG.comparisons.construction, 1200, {min: 1000, max: 2500});
-        createMarkers('equipment-markers', CONFIG.comparisons.equipment, 2400, {min: 500, max: 2500});
-        createMarkers('economic-markers', CONFIG.comparisons.economic, 60, {min: 40, max: 120});
-        createMarkers('electric-rate-markers', CONFIG.comparisons.electricRate, 100, {min: 80, max: 140});
-        createMarkers('marginal-cost-markers', CONFIG.comparisons.marginalCost, 180, {min: 140, max: 250});
+        createMarkers('water-markers', CONFIG.comparisons.water, 2.0, {min: -0.5, max: 4.5});
+        createMarkers('electric-markers', CONFIG.comparisons.electric, 275, {min: 50, max: 500});
+        createMarkers('construction-markers', CONFIG.comparisons.construction, 1750, {min: 1000, max: 2500});
+        createMarkers('equipment-markers', CONFIG.comparisons.equipment, 1500, {min: 500, max: 2500});
+        createMarkers('economic-markers', CONFIG.comparisons.economic, 70, {min: 40, max: 100});
+        createMarkers('electric-rate-markers', CONFIG.comparisons.electricRate, 110, {min: 80, max: 140});
+        createMarkers('marginal-cost-markers', CONFIG.comparisons.marginalCost, 195, {min: 140, max: 250});
 
         // Event listeners
         document.getElementById('water-slider').addEventListener('input', updateAll);
