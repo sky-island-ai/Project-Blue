@@ -425,7 +425,7 @@
 
         .slider-container {
             position: relative;
-            margin: 40px 0 60px;
+            margin: 40px 0 70px;
             padding: 0;
             user-select: none;
             -webkit-user-select: none;
@@ -435,7 +435,7 @@
 
         .comparison-markers {
             position: absolute;
-            bottom: -50px;
+            bottom: -45px;
             left: 0;
             right: 0;
             height: 45px;
@@ -455,7 +455,7 @@
             flex-direction: column;
             align-items: center;
             gap: 4px;
-            top: 15px;
+            top: 10px;
         }
 
         .marker:hover {
@@ -498,14 +498,17 @@
         }
 
         .marker-label {
-            white-space: nowrap;
+            /* Allow labels to wrap onto a second line without forcing a fixed width */
+            white-space: normal;
             padding: 2px 6px;
             border-radius: 4px;
             background: var(--bg-card);
             border: 1px solid var(--border);
-            max-width: 120px;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            max-width: 90px; /* cap width but allow wrapping */
+            overflow: visible; /* show full wrapped text */
+            text-overflow: unset;
+            line-height: 1.2; /* match developer marker spacing */
+            text-align: center; /* center align for consistency */
             transition: all var(--transition-fast);
         }
 
@@ -1264,7 +1267,7 @@
 
         <div style="background: var(--bg-card); border-radius: 12px; padding: 20px; margin: 24px 0; border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
             <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin: 0; text-align: center;">
-                <strong style="color: var(--text-primary);">Many details about Project Blue are unknown.</strong> <strong style="color: var(--accent-water);">Drag the sliders below</strong> to see how different possibilities could change the ultimate impact on Tucson's resources and economy. Click on the labeled reference points for some of the possibilities based on the developer's claims and other industry data.
+                <strong style="color: var(--text-primary);">Many details about Project Blue are unknown.</strong> <br><strong style="color: var(--accent-water);">Drag the sliders below</strong> to see how different possibilities could change the ultimate impact on Tucson's resources and economy. <br><strong style="color: var(--accent-water);">Click on the labeled reference points</strong> for some of the possibilities based on the developer's claims and other industry data.
             </p>
         </div>
 
@@ -1358,7 +1361,7 @@
                         <input type="range" class="slider" id="electric-rate-slider" min="80" max="140" step="1" value="100">
                         <div class="comparison-markers" id="electric-rate-markers" style="z-index: 5;"></div>
                     </div>
-                    <div style="text-align: center; font-size: 16px; font-weight: 600; margin-top: -40px;" id="electric-rate-value">$100</div>
+                    <div style="text-align: center; font-size: 24px; font-weight: 700; margin-top: -40px; font-family: 'JetBrains Mono', monospace; color: var(--text-primary);" id="electric-rate-value">$100</div>
                 </div>
 
                 <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border);">
@@ -1367,7 +1370,7 @@
                         <input type="range" class="slider" id="marginal-cost-slider" min="140" max="250" step="1" value="180">
                         <div class="comparison-markers" id="marginal-cost-markers" style="z-index: 5;"></div>
                     </div>
-                    <div style="text-align: center; font-size: 16px; font-weight: 600; margin-top: -40px;" id="marginal-cost-value">$180</div>
+                    <div style="text-align: center; font-size: 24px; font-weight: 700; margin-top: -40px; font-family: 'JetBrains Mono', monospace; color: var(--text-primary);" id="marginal-cost-value">$180</div>
                 </div>
             </div>
         </div>
