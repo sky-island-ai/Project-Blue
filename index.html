@@ -436,8 +436,9 @@
         .comparison-markers {
             position: absolute;
             bottom: -45px;
-            left: 0;
-            right: 0;
+            /* Updated: offset to align markers with usable slider track (accounts for 28px thumb width) */
+            left: 14px;
+            right: 14px;
             height: 45px;
             z-index: 5;
         }
@@ -513,7 +514,8 @@
         }
 
         .marker:hover .marker-label {
-            max-width: none;
+            /* Preserve original wrapping so text like "Google Mesa (min)" stays on two lines */
+            max-width: 90px;
             z-index: 10;
             box-shadow: var(--shadow-sm);
         }
@@ -600,6 +602,11 @@
             .slider::-moz-range-thumb {
                 width: 36px;
                 height: 36px;
+            }
+            /* Thumb grows to 36px ⇒ half is 18px */
+            .comparison-markers {
+                left: 18px;
+                right: 18px;
             }
         }
 
@@ -1192,6 +1199,10 @@
                 width: 32px;
                 height: 32px;
             }
+            .comparison-markers {
+                left: 16px;
+                right: 16px;
+            }
         }
 
         /* High contrast mode support */
@@ -1596,7 +1607,7 @@
                       tooltip: "Small facility construction" },
                     { label: "Developer Claim", value: 1200, type: "developer",
                       tooltip: "Developer claim: $1.2B construction investment" },
-                    { label: "Typical", value: 2020, type: "median",
+                    { label: "Typical", value: 2000, type: "median",
                       tooltip: "Industry typical for 2.25M sq ft" },
                     { label: "High", value: 2500, type: "benchmark",
                       tooltip: "Premium construction" }
