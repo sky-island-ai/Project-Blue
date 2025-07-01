@@ -191,10 +191,8 @@
         .slider-container {
             position: relative;
             margin: 70px 0 20px;
-            /* Add horizontal padding equal to half the slider thumb width so that the knob never extends beyond the viewport on mobile */
-            padding: 0 18px;
-            /* Hide any overflow from marker labels or shadows to avoid forcing horizontal scroll */
-            overflow-x: hidden;
+            /* Horizontal padding will be applied on small screens via media query */
+            padding: 0;
             user-select: none;
             -webkit-user-select: none;
             -moz-user-select: none;
@@ -771,6 +769,12 @@
                 width: 6px;
                 height: 6px;
             }
+
+            /* Provide extra horizontal padding inside each slider container so marker labels
+               don't extend beyond the viewport, eliminating the need for horizontal scroll */
+            .slider-container {
+                padding: 0 32px; /* 32px ≈ half of the 60px max-width marker label */
+            }
         }
     </style>
 </head>
@@ -1236,6 +1240,15 @@
                 marker.className = 'marker' + (comp.type === 'developer' ? ' developer' : '');
                 const position = ((comp.value - range.min) / (range.max - range.min)) * 100;
                 marker.style.left = position + '%';
+               
+                // Adjust transform for edge markers so labels stay within viewport
+                if (comp.value === range.min) {
+                    // Left edge – anchor to left side instead of centering
+                    marker.style.transform = 'translateX(0)';
+                } else if (comp.value === range.max) {
+                    // Right edge – anchor to right side
+                    marker.style.transform = 'translateX(-100%)';
+                }
                
                 const dot = document.createElement('div');
                 dot.className = 'marker-dot';
