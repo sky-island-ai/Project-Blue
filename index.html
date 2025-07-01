@@ -191,7 +191,10 @@
         .slider-container {
             position: relative;
             margin: 70px 0 20px;
-            padding: 0;
+            /* Add horizontal padding equal to half the slider thumb width so that the knob never extends beyond the viewport on mobile */
+            padding: 0 18px;
+            /* Hide any overflow from marker labels or shadows to avoid forcing horizontal scroll */
+            overflow-x: hidden;
             user-select: none;
             -webkit-user-select: none;
             -moz-user-select: none;
