@@ -966,12 +966,14 @@
         }
 
         .construction-value {
-            font-size: 28px;
-            font-weight: 700;
+            font-size: clamp(36px, 6vw, 48px);
+            font-weight: 800;
             color: var(--accent-economy);
             font-family: 'JetBrains Mono', monospace;
             cursor: help;
             transition: transform var(--transition-fast);
+            margin-bottom: 8px;
+            text-shadow: 0 0 30px rgba(16, 185, 129, 0.5);
         }
 
         .construction-value:hover {
@@ -1262,7 +1264,7 @@
 
         <div style="background: var(--bg-card); border-radius: 12px; padding: 20px; margin: 24px 0; border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
             <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin: 0; text-align: center;">
-                <strong style="color: var(--text-primary);">Many details about Project Blue are unknown.</strong> <strong style="color: var(--accent-water);">Drag the sliders below</strong> to see how different possibilities could change the ultimate impact on Tucson's resources and economy. Click on the labeled reference points for some of the possibilities based on Project Blue's claims and other industry data.
+                <strong style="color: var(--text-primary);">Many details about Project Blue are unknown.</strong> <strong style="color: var(--accent-water);">Drag the sliders below</strong> to see how different possibilities could change the ultimate impact on Tucson's resources and economy. Click on the labeled reference points for some of the possibilities based on the developer's claims and other industry data.
             </p>
         </div>
 
@@ -1323,7 +1325,7 @@
                 </div>
 
                 <div>
-                    <h3 style="font-size: 14px; margin-bottom: 12px; color: var(--text-secondary);" data-tooltip="Servers and cooling equipment purchased from outside Tucson. Minimal local economic benefit (~5% capture) but gets 8.7% tax exemption that reduces annual revenue">Equipment Investment</h3>
+                    <h3 style="font-size: 14px; margin-bottom: 12px; color: var(--text-secondary);" data-tooltip="Servers and cooling equipment purchased from outside Tucson. Local economic benefit during construction (~5% capture for installation) but gets 8.7% tax exemption that reduces annual revenue">Equipment Investment</h3>
                     <div class="slider-container">
                         <input type="range" class="slider" id="equipment-slider" min="500" max="2500" step="50" value="2400">
                         <div class="comparison-markers" id="equipment-markers"></div>
@@ -1474,9 +1476,9 @@
                     <div class="net-subtitle">per year (ongoing)</div>
                    
                     <div class="construction-section">
-                        <h3 style="font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-secondary); margin-bottom: 16px; cursor: help;" data-tooltip="Construction spending × 48.9% local capture rate">Construction Period Benefit</h3>
+                        <h3 style="font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-secondary); margin-bottom: 16px; cursor: help;" data-tooltip="Construction spending x 48.9% local capture rate + Equipment spending x 5% local capture rate">Construction Period Local Benefit</h3>
                         <div class="construction-value" id="construction-total" data-tooltip="One-time economic stimulus">$0M</div>
-                        <div class="construction-note" id="construction-gdp" data-tooltip="Spread over 3 years of construction">0.00% of economy</div>
+                        <div class="construction-note" id="construction-gdp" data-tooltip="Construction + equipment installation over 3 years">0.00% of economy</div>
                     </div>
                 </div>
             </div>
@@ -1537,7 +1539,7 @@
             <h3>Construction vs. Equipment</h3>
             <ul>
                 <li><strong>Construction:</strong> Building the facility creates local jobs and procurement. ~48.9% stays in the local economy as wages and materials</li>
-                <li><strong>Equipment:</strong> Servers and cooling systems get an 8.7% tax exemption under <a href="https://www.azleg.gov/ars/41/01519.htm" target="_blank" style="color: #60a5fa;">Arizona's Certified Data Center program</a> for 20 years when the project qualifies as a "sustainable redevelopment project" through LEED or similar green building certification</li>
+                <li><strong>Equipment:</strong> Servers and cooling systems purchased from outside Tucson. ~5% stays local during construction (installation labor). Equipment gets an 8.7% tax exemption under <a href="https://www.azleg.gov/ars/41/01519.htm" target="_blank" style="color: #60a5fa;">Arizona's Certified Data Center program</a> for 20 years when the project qualifies as a "sustainable redevelopment project" through LEED or similar green building certification</li>
                 <li><strong>Note:</strong> Both Google and Meta build their data center campuses to LEED Gold standards or higher, qualifying them for the 20-year exemption period</li>
                 <li><strong>Property Tax:</strong> 0.79% effective rate (Tucson median)</li>
             </ul>
@@ -1896,10 +1898,10 @@
             const localCapture = value * 0.05; // 5% local capture
            
             document.getElementById('equipment-value').innerHTML = `
-                <div class="value-main">$${value.toLocaleString()}M in equipment purchases</div>
+                <div class="value-main">${value.toLocaleString()}M in equipment purchases</div>
                 <div class="value-details">
-                    Only ~$${localCapture.toFixed(0)}M stays local (5% capture - mostly installation labor)<br>
-                    Tax exemption costs Tucson $${annualAbatement.toFixed(1)}M/year for 20 years (LEED certified)
+                    ~${localCapture.toFixed(0)}M stays local during construction (5% capture - installation labor)<br>
+                    Tax exemption costs Tucson ${annualAbatement.toFixed(1)}M/year for 20 years (LEED certified)
                 </div>
             `;
         }
@@ -1991,6 +1993,8 @@
            
             // Construction impact (one-time)
             const constructionBenefit = constructionInvestment * CONFIG.rates.localCaptureRate;
+            const equipmentLocalCapture = equipmentInvestment * 0.05; // 5% local capture for equipment
+            const totalConstructionBenefit = constructionBenefit + equipmentLocalCapture;
            
             // Update display
             document.getElementById('electric-tax').textContent = '+$' + (totalElectricTax/1000000).toFixed(2) + 'M';
@@ -2085,13 +2089,13 @@
                 `Sum of all annual impacts: Electric + Water + Fiscal = $${(netAnnual/1000000).toFixed(1)}M`);
            
             // Construction impact
-            document.getElementById('construction-total').textContent = '+$' + constructionBenefit.toFixed(0) + 'M';
+            document.getElementById('construction-total').textContent = '+$' + totalConstructionBenefit.toFixed(0) + 'M';
             document.getElementById('construction-total').setAttribute('data-tooltip',
-                `Formula: $${constructionInvestment}M × 48.9% capture rate = $${constructionBenefit.toFixed(0)}M`);
+                `Construction: $${constructionInvestment}M × 48.9% = $${constructionBenefit.toFixed(1)}M + Equipment: $${equipmentInvestment}M × 5% = $${equipmentLocalCapture.toFixed(1)}M = $${totalConstructionBenefit.toFixed(1)}M total`);
            
-            const constructionGDP = (constructionBenefit / (CONFIG.tucsonGDP * 1000)) * 100;
+            const constructionGDP = (totalConstructionBenefit / (CONFIG.tucsonGDP * 1000)) * 100;
             document.getElementById('construction-gdp').textContent =
-                constructionGDP.toFixed(2) + '% of economy (over 3 years)';
+                constructionGDP.toFixed(2) + '% of economy (construction + equipment installation over 3 years)';
            
             // Reinitialize tooltips for dynamically updated elements
             initializeTooltips();
