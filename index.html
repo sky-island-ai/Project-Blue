@@ -1349,7 +1349,7 @@
                 <div>
                     <h3 style="font-size: 14px; margin-bottom: 12px; color: var(--text-secondary);" data-tooltip="Direct payroll plus local procurement. Formula: Jobs × Avg Salary + Local Services. Economic multiplier: 1.4x at minimum spending, 2.4x at maximum">Annual Local Spending</h3>
                     <div class="slider-container">
-                        <input type="range" class="slider" id="economic-slider" min="40" max="100" step="5" value="70">
+                        <input type="range" class="slider" id="economic-slider" min="0" max="1" step="0.05" value="0.5">
                         <div class="comparison-markers" id="economic-markers"></div>
                     </div>
                     <div class="slider-value" id="economic-value"></div>
@@ -1609,11 +1609,11 @@
                       tooltip: "Developer claim: $2.4B equipment over 3 years" }
                 ],
                 economic: [
-                    { label: "Min", value: 45, type: "benchmark",
+                    { label: "Min", value: 0, type: "benchmark",
                       tooltip: "Contractual minimum: 75 jobs @ $75k. Economic multiplier: 1.4x" },
-                    { label: "Developer Claim", value: 60, type: "developer",
+                    { label: "Developer Claim", value: 0.6, type: "developer",
                       tooltip: "Developer claim: 180 jobs @ $64k average" },
-                    { label: "High", value: 85, type: "benchmark",
+                    { label: "High", value: 1, type: "benchmark",
                       tooltip: "Best case scenario. Economic multiplier: 2.4x" }
                 ],
                 electricRate: [
@@ -1910,22 +1910,24 @@
         }
 
         function updateEconomic() {
-            const value = parseFloat(document.getElementById('economic-slider').value);
-            const jobs = value < 50 ? 75 : 180;
-            const avgSalary = value < 50 ? 75000 : 64000;
-            const payroll = jobs * avgSalary / 1000000;
-            const localServices = value - payroll;
-           
-            // Calculate economic multiplier
-            const multiplier = 1.4 + (value - 40) / (100 - 40) * (2.4 - 1.4);
-            const totalImpact = value * multiplier;
-           
+            const econSlider = document.getElementById('economic-slider');
+            const sliderVal = parseFloat(econSlider.value);
+            const minVal = parseFloat(econSlider.min);
+            const maxVal = parseFloat(econSlider.max);
+            const range = (maxVal - minVal) || 1;
+            const x = (sliderVal - minVal) / range;
+            // Jobs and multiplier per new specification (updated)
+            const jobs = 75 + 175 * x;
+            const multiplier = 1.4 + 1.0 * x;
+            // Direct spending and total impact (dollars)
+            const directSpend = jobs * 250000;
+            const totalImpact = directSpend * multiplier;
+ 
             document.getElementById('economic-value').innerHTML = `
-                <div class="value-main">$${value}M annual local activity</div>
+                <div class="value-main">$${(totalImpact / 1e6).toFixed(1)}M total economic impact</div>
                 <div class="value-details">
-                    ~${jobs} jobs @ $${avgSalary.toLocaleString()} = $${payroll.toFixed(1)}M payroll<br>
-                    ~$${localServices.toFixed(1)}M in local procurement and services<br>
-                    <span style="color: var(--text-muted)">Total economic impact with ${multiplier.toFixed(1)}x multiplier: $${totalImpact.toFixed(1)}M</span>
+                    Jobs: ~${jobs.toFixed(0)}<br>
+                    Economic Multiplier: ${multiplier.toFixed(1)}×
                 </div>
             `;
         }
@@ -1948,7 +1950,17 @@
             const electricMW = parseFloat(document.getElementById('electric-slider').value);
             const constructionInvestment = parseFloat(document.getElementById('construction-slider').value);
             const equipmentInvestment = parseFloat(document.getElementById('equipment-slider').value);
-            const localEconomicActivity = parseFloat(document.getElementById('economic-slider').value);
+            // ECONOMIC IMPACT – recalc using new J/M formula (range-agnostic)
+            const econSlider = document.getElementById('economic-slider');
+            const econSliderVal = parseFloat(econSlider.value);
+            const econMin = parseFloat(econSlider.min);
+            const econMax = parseFloat(econSlider.max);
+            const econRange = (econMax - econMin) || 1;
+            const econX = (econSliderVal - econMin) / econRange;
+            const econJobs = 75 + 175 * econX;
+            const econMultiplier = 1.4 + 1.0 * econX;
+            const econDirectSpend = econJobs * 250000; // dollars
+            const localEconomicActivity = (econDirectSpend * econMultiplier) / 1e6; // in millions
             const electricRate = parseFloat(document.getElementById('electric-rate-slider').value);
             const marginalCost = parseFloat(document.getElementById('marginal-cost-slider').value);
            
@@ -2143,7 +2155,11 @@
         createMarkers('electric-markers', CONFIG.comparisons.electric, 275, {min: 50, max: 500});
         createMarkers('construction-markers', CONFIG.comparisons.construction, 1750, {min: 1000, max: 2500});
         createMarkers('equipment-markers', CONFIG.comparisons.equipment, 1500, {min: 500, max: 2500});
-        createMarkers('economic-markers', CONFIG.comparisons.economic, 70, {min: 40, max: 100});
+        const econSliderInit = document.getElementById('economic-slider');
+        createMarkers('economic-markers', CONFIG.comparisons.economic, parseFloat(econSliderInit.value), {
+            min: parseFloat(econSliderInit.min),
+            max: parseFloat(econSliderInit.max)
+        });
         createMarkers('electric-rate-markers', CONFIG.comparisons.electricRate, 110, {min: 80, max: 140});
         createMarkers('marginal-cost-markers', CONFIG.comparisons.marginalCost, 195, {min: 140, max: 250});
 
