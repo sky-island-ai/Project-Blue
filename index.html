@@ -169,12 +169,6 @@
             background: linear-gradient(135deg, var(--text-primary), var(--accent-water));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            cursor: help;
-            transition: transform var(--transition-fast);
-        }
-
-        h1:hover {
-            transform: translateX(2px);
         }
 
         .subtitle {
@@ -207,6 +201,15 @@
             height: 100%;
             background: var(--accent-water);
             opacity: 0.5;
+        }
+
+        .summary-highlight {
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-top: 16px;
+            padding: 12px;
+            border-radius: 8px;
+            background: rgba(15, 23, 42, 0.7);
         }
 
         .info-button {
@@ -1237,13 +1240,14 @@
         </div>
 
         <header>
-            <h1 data-tooltip="This dashboard calculates the true financial impact of Project Blue on Tucson taxpayers and ratepayers using economic modeling techniques">Project Blue Tucson Data Center Campus Impact Dashboard</h1>
+            <h1>Project Blue Tucson Data Center Impact Dashboard</h1>
             <div class="subtitle">
                 <span>Economic impact calculator based on Net Local Impact methodology</span>
                 <button class="info-button" onclick="showMethodology()"><span>ⓘ Methodology & Sources</span></button>
             </div>
             <div class="summary">
-                Project Blue is a large-scale data center campus proposed by developer Beale Infrastructure for a 290-acre site in the Tucson area, intended for an undisclosed major technology client. The project plans to invest billions in construction and equipment, creating temporary construction jobs and permanent operational jobs, while also funding an 18-mile extension of the reclaimed water system. However, the proposal has drawn significant criticism from local officials and residents over the lack of transparency and the potential strain on local water and energy resources in a desert community.
+                <p>Project Blue is a large-scale data center campus proposed by developer Beale Infrastructure for a 290-acre site in the Tucson area, intended for an undisclosed major technology client. The project plans to invest billions in construction and equipment, creating temporary construction jobs and permanent operational jobs, while also funding an 18-mile extension of the reclaimed water system. However, the proposal has drawn significant criticism from local officials and residents over the lack of transparency and the potential strain on local water and energy resources in a desert community.</p>
+                <p class="summary-highlight">This dashboard creates interactive projections of the resource utilization and financial impact of Project Blue on Tucson taxpayers and ratepayers using public industry data and economic modeling techniques.</p>
             </div>
         </header>
 
@@ -1268,7 +1272,7 @@
 
         <div style="background: var(--bg-card); border-radius: 12px; padding: 20px; margin: 24px 0; border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
             <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin: 0; text-align: center;">
-                <strong style="color: var(--text-primary);">Many details about Project Blue are unknown.</strong> <br><strong style="color: var(--accent-water);">Drag the sliders below</strong> to see how different possibilities could change the ultimate impact on Tucson's resources and economy. <br><strong style="color: var(--accent-water);">Click on the labeled reference points</strong> for some of the possibilities based on the developer's claims and other industry data.
+                <strong style="color: var(--text-primary); font-size: 16px;">Many details about Project Blue are unknown.</strong> <br><strong style="color: var(--accent-water);">Drag the sliders below</strong> to see how different possibilities could change the ultimate impact on Tucson's resources and economy. <br><strong style="color: var(--accent-water);">Click on the labeled reference points</strong> to explore the possibilities based on the developer's claims and other industry data.
             </p>
         </div>
 
