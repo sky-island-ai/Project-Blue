@@ -1277,7 +1277,7 @@
                 <div class="slider-header">
                     <div class="slider-title" data-tooltip="Potable water consumption for cooling servers in Million Gallons per Day (MGD). Data centers require significant water for evaporative cooling in hot climates like Tucson">
                         <span class="icon">💧</span>
-                        <h2>WATER USE (MGD)</h2>
+                        <h2>WATER USE</h2>
                     </div>
                     <div class="consumption-badge" id="water-badge" data-tooltip="Percentage of Tucson's potable water delivery (78.6 MGD in 2024)">0% of Tucson Potable Water</div>
                 </div>
@@ -1716,6 +1716,22 @@
             tooltip.classList.remove('show');
         });
 
+        // Hide tooltip when the user clicks / taps anywhere that is *not* the tooltip itself
+        // or another element carrying a data-tooltip attribute. Using pointer events covers
+        // both mouse clicks and touch interactions.
+        document.addEventListener('pointerdown', (e) => {
+            // If no tooltip is visible, there is nothing to hide
+            if (!tooltip.classList.contains('show')) return;
+
+            // If the tap/click was inside the tooltip, keep it open so links remain usable
+            if (tooltip.contains(e.target)) return;
+
+            // If the tap/click was on another tooltip-enabled element, let that handler manage visibility
+            if (e.target.closest('[data-tooltip]')) return;
+
+            tooltip.classList.remove('show');
+        });
+
         function createMarkers(containerId, comparisons, currentValue, range) {
             const container = document.getElementById(containerId);
             if (!container) return;
@@ -1846,7 +1862,7 @@
                 `;
             } else {
                 document.getElementById('water-value').innerHTML = `
-                    <div class="value-main">${mgd.toFixed(1)} MGD of potable water</div>
+                    <div class="value-main">${mgd.toFixed(1)} million gallons per day (MGD) of potable water</div>
                     <div class="value-details">
                         Equivalent to ${households.toLocaleString()} households<br>
                         ${(gallonsPerYear/1000000).toFixed(1)} million gallons annually<br>
