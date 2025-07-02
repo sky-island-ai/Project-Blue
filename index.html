@@ -1585,7 +1585,7 @@
                       tooltip: "Typical mature campus usage (1 TWh/yr)",
                       source: "https://sustainability.atmeta.com/wp-content/uploads/2024/08/Meta-2024-Sustainability-Report.pdf" },
                     { label: "Meta Mesa", value: 450, type: "benchmark",
-                      tooltip: "Meta's similarly sized Mesa campus will require 450 MW (3.9 TWh/yr)",
+                      tooltip: "Meta's similarly sized campus in Mesa, AZ will require 450 MW (3.9 TWh/yr)",
                       source: "https://azbigmedia.com/business/heres-why-metro-phoenix-has-become-the-data-center-destination/" }
                 ],
                 construction: [
@@ -1868,7 +1868,7 @@
             updateConsumptionBadge('electric-badge', percent, 'TEP Supply');
            
             document.getElementById('electric-value').innerHTML = `
-                <div class="value-main">${mw} MW continuous load</div>
+                <div class="value-main">${mw} megawatts (MW)</div>
                 <div class="value-details">
                     ${twhPerYear.toFixed(2)} TWh/year (${mwhPerYear.toLocaleString()} MWh)<br>
                     Powers equivalent of ${households.toLocaleString()} households<br>
