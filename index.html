@@ -451,8 +451,9 @@
             top: 10px;
         }
 
+        /* Remove vertical shift to keep tooltip anchor stable */
         .marker:hover {
-            transform: translateX(-50%) translateY(-2px);
+            transform: translateX(-50%);
             z-index: 10;
         }
 
@@ -1647,8 +1648,8 @@
                       source: "https://time.com/5814276/google-data-centers-water/" }
                 ],
                 electric: [
-                    { label: "Meta Texas & NM", value: 1.05, type: "benchmark",
-                      tooltip: "Meta's Fort Worth, TX and Los Lunas, NM campuses each use a little over 1 TWh/yr.",
+                    { label: "Meta Texas", value: 1.05, type: "benchmark",
+                      tooltip: "Meta's Fort Worth, TX campus uses a little over 1 TWh/yr. The Los Lunas, NM campus is similar at 1.11 TWh/yr.",
                       source: "https://sustainability.atmeta.com/wp-content/uploads/2024/08/Meta-2024-Sustainability-Report.pdf" },
                     { label: "Meta Mesa (max)", value: 3.95, type: "benchmark",
                       tooltip: "Meta's similarly sized campus in Mesa, AZ will require 450&nbsp;MW. <a href=\"https://azbigmedia.com/business/heres-why-metro-phoenix-has-become-the-data-center-destination/\" target=\"_blank\" style=\"color: #60a5fa;\">Source ↗</a> That's almost 4&nbsp;TWh/yr at max capacity (actual annual usage is TBD). That would equal the usage of TEP's <strong>entire residential population</strong>. <a href=\"https://www.eia.gov/electricity/sales_revenue_price/pdf/table_6.pdf\" target=\"_blank\" style=\"color: #60a5fa;\">Source ↗</a>",
@@ -1749,17 +1750,17 @@
                     hideTooltip(e);
                 });
 
-                // Tap / click to toggle tooltip visibility
-                element.addEventListener('click', (e) => {
-                    const isSame = lockedTooltipTarget === e.currentTarget;
-                    if (isSame && tooltip.classList.contains('show')) {
+                // Use pointerdown so it fires on both mouse click and touch, and in the capture phase before the document listener.
+                element.addEventListener('pointerdown', (e) => {
+                    const isSame = lockedTooltipTarget === e.currentTarget && tooltip.classList.contains('show');
+                    if (isSame) {
                         hideTooltipInstant();
                     } else {
                         showTooltip(e, e.currentTarget.dataset.tooltip);
                         lockedTooltipTarget = e.currentTarget;
                     }
                     e.stopPropagation();
-                });
+                }, { capture: true });
             });
 
             // Hide tooltip on scroll
@@ -1771,7 +1772,9 @@
             tooltip.innerHTML = content;
             tooltip.classList.add('show');
            
-            const rect = event.target.getBoundingClientRect();
+            // Use the element the listener was attached to (currentTarget) as the anchor; fall back to target if undefined
+            const anchor = event.currentTarget || event.target;
+            const rect = anchor.getBoundingClientRect();
             const tooltipRect = tooltip.getBoundingClientRect();
            
             let x = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
@@ -1791,9 +1794,12 @@
         }
 
         function hideTooltip(event) {
-            if (event.relatedTarget && tooltip.contains(event.relatedTarget)) {
-                return;
-            }
+            // If the tooltip has been locked via a click/tap, don't auto-hide on mouseleave
+            if (lockedTooltipTarget) return;
+
+            // Keep tooltip visible when moving the mouse from target into the tooltip itself
+            if (event.relatedTarget && tooltip.contains(event.relatedTarget)) return;
+
             tooltipTimeout = setTimeout(() => {
                 tooltip.classList.remove('show');
             }, 100);
@@ -1818,6 +1824,9 @@
 
             // If the tap/click was inside the tooltip, keep it open so links remain usable
             if (tooltip.contains(e.target)) return;
+
+            // If the tap/click was on the currently locked tooltip target or inside it, keep it open
+            if (lockedTooltipTarget && lockedTooltipTarget.contains(e.target)) return;
 
             // If the tap/click was on another tooltip-enabled element, let that handler manage visibility
             if (e.target.closest('[data-tooltip]')) return;
@@ -1860,15 +1869,33 @@
                     marker.addEventListener('mouseleave', hideTooltip);
                 }
                
-                // Ensure the slider updates on the very first tap (especially on touch devices) by using a captured pointerdown listener.
-                marker.addEventListener('pointerdown', () => {
+                // Use a captured pointerdown to both move the slider and toggle (lock/unlock) the tooltip.
+                marker.addEventListener('pointerdown', (e) => {
+                    // 1) Move the slider immediately
                     const sliderId = containerId.replace('-markers', '-slider');
                     const slider = document.getElementById(sliderId);
                     if (slider) {
-                        // Set value and trigger change
                         slider.value = comp.value;
                         slider.dispatchEvent(new Event('input', { bubbles: true }));
                         updateAll();
+                    }
+
+                    // 2) Toggle tooltip lock/unlock behaviour
+                    if (comp.tooltip || comp.source) {
+                        const isSame = lockedTooltipTarget === marker && tooltip.classList.contains('show');
+                        if (isSame) {
+                            hideTooltipInstant();
+                        } else {
+                            let tooltipContent = `<strong>${comp.label}</strong><br>${comp.tooltip || ''}`;
+                            if (comp.source && comp.source.startsWith('http')) {
+                                tooltipContent += `<br><a href="${comp.source}" target="_blank">Source ↗</a>`;
+                            } else if (comp.source) {
+                                tooltipContent += `<br><em>${comp.source}</em>`;
+                            }
+                            showTooltip(e, tooltipContent);
+                            lockedTooltipTarget = marker;
+                        }
+                        e.stopPropagation();
                     }
                 }, { capture: true });
                
