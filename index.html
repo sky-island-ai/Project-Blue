@@ -757,6 +757,7 @@
             font-family: 'JetBrains Mono', monospace;
             cursor: help;
             transition: transform var(--transition-fast);
+            white-space: nowrap; /* prevent line breaks so the minus sign and number stay together on mobile */
         }
 
         .cost-line:hover .cost-value {
@@ -2170,7 +2171,7 @@
                 'No subsidy when rates cover marginal costs');
            
             document.getElementById('net-electric').textContent =
-                (netElectric >= 0 ? '+' : '') + '$' + (netElectric/1000000).toFixed(2) + 'M';
+                (netElectric >= 0 ? '+$' : '-$') + Math.abs(netElectric/1000000).toFixed(2) + 'M';
             document.getElementById('net-electric').className = 'cost-value ' +
                 (netElectric >= 0 ? 'positive' : 'negative');
            
@@ -2199,7 +2200,7 @@
             }
            
             document.getElementById('net-water').textContent =
-                (netWater >= 0 ? '+' : '') + '$' + (netWater/1000000).toFixed(2) + 'M';
+                (netWater >= 0 ? '+$' : '-$') + Math.abs(netWater/1000000).toFixed(2) + 'M';
             document.getElementById('net-water').className = 'cost-value ' +
                 (netWater >= 0 ? 'positive' : 'negative');
            
@@ -2242,7 +2243,7 @@
            
             // Net annual impact
             const netAnnualEl = document.getElementById('net-annual');
-            netAnnualEl.textContent = (netAnnual >= 0 ? '+' : '') + '$' + (netAnnual/1000000).toFixed(1) + 'M';
+            netAnnualEl.textContent = (netAnnual >= 0 ? '+$' : '-$') + Math.abs(netAnnual/1000000).toFixed(1) + 'M';
             netAnnualEl.className = 'net-annual ' + (netAnnual >= 0 ? 'positive' : 'negative');
             netAnnualEl.setAttribute('data-tooltip',
                 `Sum of all annual impacts: Electric + Water + Fiscal = $${(netAnnual/1000000).toFixed(1)}M`);
