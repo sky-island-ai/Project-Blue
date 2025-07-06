@@ -1590,7 +1590,7 @@
                       tooltip: "Meta's Fort Worth, TX and Los Lunas, NM campuses each use a little over 1 TWh/yr.",
                       source: "https://sustainability.atmeta.com/wp-content/uploads/2024/08/Meta-2024-Sustainability-Report.pdf" },
                     { label: "Meta Mesa (max)", value: 3.95, type: "benchmark",
-                      tooltip: "Meta's similarly sized campus in Mesa, AZ will require 450 MW. That's nearly 4 TWh/yr at max capacity. Actual usage is TBD.",
+                      tooltip: "Meta's similarly sized campus in Mesa, AZ will require 450 MW. That's almost 4 TWh/yr at max capacity, but actual usage is TBD.",
                       source: "https://azbigmedia.com/business/heres-why-metro-phoenix-has-become-the-data-center-destination/" }
                 ],
                 construction: [
@@ -1858,7 +1858,7 @@
                 document.getElementById('water-value').innerHTML = `
                     <div class="value-main" style="color: var(--positive);">-${Math.abs(mgd).toFixed(1)} MGD ("water positive")</div>
                     <div class="value-details">
-                        Project Blue claims they will transition to being 'water positive', meaning it would return more water to the environment than it uses, after the first 2 years of using potable water. However, they have not yet selected a specific method or water replenishment project.<br>
+                        <span style="color: var(--negative);">Project Blue claims they will transition to being 'water positive', meaning it would return more water to the environment than it uses, after the first 2 years of using potable water. However, they have not yet selected a specific method or water replenishment project.</span><br>
                         Equivalent to ${households.toLocaleString()} households worth of water<br>
                         <span style="color: ${percentColor}">
                             ${Math.abs(percent).toFixed(2)}% addition to Tucson's potable water
@@ -1888,10 +1888,15 @@
            
             updateConsumptionBadge('electric-badge', percent, 'TEP Supply');
            
+            const metaMesaNote = twhPerYear >= 3.95 ?
+                `<span style="color: var(--negative);">Meta's similarly sized campus in Mesa, AZ will require 450&nbsp;MW. <a href="https://azbigmedia.com/business/heres-why-metro-phoenix-has-become-the-data-center-destination/" target="_blank" style="color: #60a5fa;">Source ↗</a> That's almost 4&nbsp;TWh/yr at max capacity. Actual annual usage is TBD, but if Project Blue uses that much energy it would equal TEP's <strong>entire residential population</strong>. <a href="https://www.eia.gov/electricity/sales_revenue_price/pdf/table_6.pdf" target="_blank" style="color: #60a5fa;">Source ↗</a></span><br>` : '';
+           
             document.getElementById('electric-value').innerHTML = `
                 <div class="value-main">${twhPerYear.toFixed(2)} TWh/year</div>
                 <div class="value-details">
+                    ${metaMesaNote}
                     Powers equivalent of ${households.toLocaleString()} households<br>
+                    Equivalent continuous load of ${mw.toFixed(0)} MW<br>
                     <span style="color: ${percent > 20 ? 'var(--danger)' : percent > 10 ? 'var(--warning)' : 'var(--text-muted)'}">
                         ${percent.toFixed(1)}% of TEP's total generation
                     </span>
