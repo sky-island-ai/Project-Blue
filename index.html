@@ -1861,7 +1861,8 @@
                     marker.addEventListener('mouseleave', hideTooltip);
                 }
                
-                marker.addEventListener('click', () => {
+                // Ensure the slider updates on the very first tap (especially on touch devices) by using a captured pointerdown listener.
+                marker.addEventListener('pointerdown', () => {
                     const sliderId = containerId.replace('-markers', '-slider');
                     const slider = document.getElementById(sliderId);
                     if (slider) {
@@ -1870,7 +1871,7 @@
                         slider.dispatchEvent(new Event('input', { bubbles: true }));
                         updateAll();
                     }
-                });
+                }, { capture: true });
                
                 container.appendChild(marker);
             });
