@@ -1579,10 +1579,10 @@
                     { label: "Developer Claim", value: -0.1, type: "developer",
                       tooltip: "Project Blue claims they will transition to being 'water positive', meaning it would return more water to the environment than it uses, after the first 2 years of using potable water. However, they have not yet selected a specific method or water replenishment project." },
                     { label: "Google Mesa (min)", value: 1, type: "benchmark",
-                      tooltip: "Guaranteed allowance at Google's Mesa, AZ campus",
+                      tooltip: "Guaranteed allowance at Google's Mesa, AZ campus is 1 million gallons per day",
                       source: "https://time.com/5814276/google-data-centers-water/" },
                     { label: "Google Mesa (max)", value: 4, type: "benchmark",
-                      tooltip: "Maximum allowance at Google's Mesa, AZ campus",
+                      tooltip: "Maximum allowance at Google's Mesa, AZ campus is 4 million gallons per day",
                       source: "https://time.com/5814276/google-data-centers-water/" }
                 ],
                 electric: [
@@ -1590,7 +1590,7 @@
                       tooltip: "Meta's Fort Worth, TX and Los Lunas, NM campuses each use a little over 1 TWh/yr.",
                       source: "https://sustainability.atmeta.com/wp-content/uploads/2024/08/Meta-2024-Sustainability-Report.pdf" },
                     { label: "Meta Mesa (max)", value: 3.95, type: "benchmark",
-                      tooltip: "Meta's similarly sized campus in Mesa, AZ will require 450 MW. That's almost 4 TWh/yr at max capacity, but actual usage is TBD.",
+                      tooltip: "Meta's similarly sized campus in Mesa, AZ will require 450&nbsp;MW. <a href=\"https://azbigmedia.com/business/heres-why-metro-phoenix-has-become-the-data-center-destination/\" target=\"_blank\" style=\"color: #60a5fa;\">Source ↗</a> That's almost 4&nbsp;TWh/yr at max capacity (actual annual usage is TBD). That would equal the usage of TEP's <strong>entire residential population</strong>. <a href=\"https://www.eia.gov/electricity/sales_revenue_price/pdf/table_6.pdf\" target=\"_blank\" style=\"color: #60a5fa;\">Source ↗</a>",
                       source: "https://azbigmedia.com/business/heres-why-metro-phoenix-has-become-the-data-center-destination/" }
                 ],
                 construction: [
@@ -1669,14 +1669,40 @@
             }, 500);
         });
 
-        // Initialize all hover handlers
+        let lockedTooltipTarget = null;
+
+        function hideTooltipInstant() {
+            tooltip.classList.remove('show');
+            lockedTooltipTarget = null;
+        }
+
         function initializeTooltips() {
             document.querySelectorAll('[data-tooltip]').forEach(element => {
                 element.addEventListener('mouseenter', (e) => {
+                    // Skip hover behavior on touch devices
+                    if ('ontouchstart' in window) return;
                     showTooltip(e, e.target.dataset.tooltip);
                 });
-                element.addEventListener('mouseleave', hideTooltip);
+                element.addEventListener('mouseleave', (e) => {
+                    if (lockedTooltipTarget === e.target) return; // keep locked
+                    hideTooltip(e);
+                });
+
+                // Tap / click to toggle tooltip visibility
+                element.addEventListener('click', (e) => {
+                    const isSame = lockedTooltipTarget === e.currentTarget;
+                    if (isSame && tooltip.classList.contains('show')) {
+                        hideTooltipInstant();
+                    } else {
+                        showTooltip(e, e.currentTarget.dataset.tooltip);
+                        lockedTooltipTarget = e.currentTarget;
+                    }
+                    e.stopPropagation();
+                });
             });
+
+            // Hide tooltip on scroll
+            window.addEventListener('scroll', hideTooltipInstant, { passive: true });
         }
 
         function showTooltip(event, content) {
@@ -1718,6 +1744,7 @@
         });
 
         tooltip.addEventListener('mouseleave', () => {
+            if (lockedTooltipTarget) return; // keep tooltip if locked
             tooltip.classList.remove('show');
         });
 
@@ -1734,7 +1761,7 @@
             // If the tap/click was on another tooltip-enabled element, let that handler manage visibility
             if (e.target.closest('[data-tooltip]')) return;
 
-            tooltip.classList.remove('show');
+            hideTooltipInstant();
         });
 
         function createMarkers(containerId, comparisons, currentValue, range) {
@@ -1888,14 +1915,19 @@
            
             updateConsumptionBadge('electric-badge', percent, 'TEP Supply');
            
-            const metaMesaNote = twhPerYear >= 3.95 ?
-                `<span style="color: var(--negative);">Meta's similarly sized campus in Mesa, AZ will require 450&nbsp;MW. <a href="https://azbigmedia.com/business/heres-why-metro-phoenix-has-become-the-data-center-destination/" target="_blank" style="color: #60a5fa;">Source ↗</a> That's almost 4&nbsp;TWh/yr at max capacity. Actual annual usage is TBD, but if Project Blue uses that much energy it would equal TEP's <strong>entire residential population</strong>. <a href="https://www.eia.gov/electricity/sales_revenue_price/pdf/table_6.pdf" target="_blank" style="color: #60a5fa;">Source ↗</a></span><br>` : '';
+            let preMetaNote = '';
+            let postMetaNote = '';
+            if (twhPerYear >= 3.95) {
+                preMetaNote = `<span style="color: var(--negative);">Meta's similarly sized campus in Mesa, AZ will require 450&nbsp;MW. <a href="https://azbigmedia.com/business/heres-why-metro-phoenix-has-become-the-data-center-destination/" target="_blank" style="color: #60a5fa;">Source ↗</a> That's almost 4&nbsp;TWh/yr at max capacity (actual annual usage is TBD).</span><br>`;
+                postMetaNote = `<span style="color: var(--negative);">-->Equivalent to TEP's <strong>entire residential population</strong>. <a href="https://www.eia.gov/electricity/sales_revenue_price/pdf/table_6.pdf" target="_blank" style="color: #60a5fa;">Source ↗</a></span><br>`;
+            }
            
             document.getElementById('electric-value').innerHTML = `
                 <div class="value-main">${twhPerYear.toFixed(2)} TWh/year</div>
                 <div class="value-details">
-                    ${metaMesaNote}
+                    ${preMetaNote}
                     Powers equivalent of ${households.toLocaleString()} households<br>
+                    ${postMetaNote}
                     Equivalent continuous load of ${mw.toFixed(0)} MW<br>
                     <span style="color: ${percent > 20 ? 'var(--danger)' : percent > 10 ? 'var(--warning)' : 'var(--text-muted)'}">
                         ${percent.toFixed(1)}% of TEP's total generation
