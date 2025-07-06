@@ -1308,7 +1308,7 @@
                     <div class="consumption-badge" id="electric-badge" data-tooltip="Percentage of TEP's total annual generation (9.21 TWh)">0% of TEP Supply</div>
                 </div>
                 <div class="slider-container">
-                    <input type="range" class="slider" id="electric-slider" min="50" max="500" step="5" value="275">
+                    <input type="range" class="slider" id="electric-slider" min="0.5" max="4" step="0.05" value="2.25">
                     <div class="comparison-markers" id="electric-markers"></div>
                 </div>
                 <div class="slider-value" id="electric-value"></div>
@@ -1586,11 +1586,11 @@
                       source: "https://time.com/5814276/google-data-centers-water/" }
                 ],
                 electric: [
-                    { label: "Meta Texas", value: 115, type: "benchmark",
-                      tooltip: "Meta's Fort Worth, TX campus uses 1 TWh/yr (equivalent to 115 MW)",
+                    { label: "Meta Texas & New Mexico", value: 1.05, type: "benchmark",
+                      tooltip: "Meta's Fort Worth, TX and Los Lunas, NM campuses each use a little over 1 TWh/yr.",
                       source: "https://sustainability.atmeta.com/wp-content/uploads/2024/08/Meta-2024-Sustainability-Report.pdf" },
-                    { label: "Meta Mesa", value: 450, type: "benchmark",
-                      tooltip: "Meta's similarly sized campus in Mesa, AZ will require 450 MW (3.9 TWh/yr)",
+                    { label: "Meta Mesa (max)", value: 3.95, type: "benchmark",
+                      tooltip: "Meta's similarly sized campus in Mesa, AZ will require 450 MW. That's nearly 4 TWh/yr at max capacity. Actual usage is TBD.",
                       source: "https://azbigmedia.com/business/heres-why-metro-phoenix-has-become-the-data-center-destination/" }
                 ],
                 construction: [
@@ -1880,8 +1880,8 @@
         }
 
         function updateElectric() {
-            const mw = parseFloat(document.getElementById('electric-slider').value);
-            const twhPerYear = mw * 0.00876; // Correct formula: MW * 0.00876 = TWh/yr
+            const twhPerYear = parseFloat(document.getElementById('electric-slider').value);
+            const mw = twhPerYear / 0.00876; // Convert TWh/yr back to continuous MW load
             const mwhPerYear = twhPerYear * 1000000;
             const households = Math.round(mw * 1000 / 1.1); // ~1.1 kW per household
             const percent = (twhPerYear / CONFIG.tepTotal * 100);
@@ -1889,9 +1889,8 @@
             updateConsumptionBadge('electric-badge', percent, 'TEP Supply');
            
             document.getElementById('electric-value').innerHTML = `
-                <div class="value-main">${mw} megawatts (MW)</div>
+                <div class="value-main">${twhPerYear.toFixed(2)} TWh/year</div>
                 <div class="value-details">
-                    ${twhPerYear.toFixed(2)} TWh/year (${mwhPerYear.toLocaleString()} MWh)<br>
                     Powers equivalent of ${households.toLocaleString()} households<br>
                     <span style="color: ${percent > 20 ? 'var(--danger)' : percent > 10 ? 'var(--warning)' : 'var(--text-muted)'}">
                         ${percent.toFixed(1)}% of TEP's total generation
@@ -1965,7 +1964,8 @@
             // Get inputs
             const waterMGD = parseFloat(document.getElementById('water-slider').value);
             const waterAF = waterMGD / 0.00089; // Convert MGD to AF/yr
-            const electricMW = parseFloat(document.getElementById('electric-slider').value);
+            const twhPerYear = parseFloat(document.getElementById('electric-slider').value);
+            const electricMW = twhPerYear / 0.00876; // Convert TWh/yr back to continuous MW load
             const constructionInvestment = parseFloat(document.getElementById('construction-slider').value);
             const equipmentInvestment = parseFloat(document.getElementById('equipment-slider').value);
             // ECONOMIC IMPACT – recalc using new J/M formula (range-agnostic)
@@ -1983,7 +1983,7 @@
             const marginalCost = parseFloat(document.getElementById('marginal-cost-slider').value);
            
             // Calculate electric impact
-            const mwhPerYear = electricMW * 0.00876 * 1000000; // MW * 0.00876 = TWh/yr, then convert to MWh
+            const mwhPerYear = twhPerYear * 1000000; // TWh/yr × 1,000,000 = MWh
             const electricBill = mwhPerYear * electricRate;
             const electricTaxRevenue = electricBill * CONFIG.rates.electricTax;
            
@@ -2087,7 +2087,7 @@
            
             // Share visualizations
             const waterPercent = (waterMGD / CONFIG.tucsonWaterPotable * 100);
-            const electricPercent = ((electricMW * 0.00876) / CONFIG.tepTotal * 100);
+            const electricPercent = (twhPerYear / CONFIG.tepTotal * 100);
            
             // Economic activity as direct spending only (not including tax revenue)
             const economyPercent = (localEconomicActivity / (CONFIG.tucsonGDP * 1000)) * 100;
@@ -2170,7 +2170,7 @@
 
         // Initialize
         createMarkers('water-markers', CONFIG.comparisons.water, 2.0, {min: -0.5, max: 4.5});
-        createMarkers('electric-markers', CONFIG.comparisons.electric, 275, {min: 50, max: 500});
+        createMarkers('electric-markers', CONFIG.comparisons.electric, 2.25, {min: 0.5, max: 4});
         createMarkers('construction-markers', CONFIG.comparisons.construction, 1750, {min: 1000, max: 2500});
         createMarkers('equipment-markers', CONFIG.comparisons.equipment, 1500, {min: 500, max: 2500});
         const econSliderInit = document.getElementById('economic-slider');
