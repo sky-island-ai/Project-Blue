@@ -911,7 +911,7 @@
             width: 200%;
             height: 200%;
             background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%);
-            animation: rotate 20s linear infinite;
+            animation: none;
         }
 
         @keyframes rotate {
@@ -1092,16 +1092,71 @@
             box-shadow: var(--shadow-sm);
         }
 
+        .promotional-banner {
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-card));
+            border-radius: 16px;
+            padding: 32px;
+            margin: 48px 0 32px;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideUp 0.6s ease forwards;
+            animation-delay: 1.4s;
+        }
+
+        .promotional-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.05) 0%, transparent 70%);
+            animation: rotate 25s linear infinite;
+        }
+
+        .banner-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .promotional-banner h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-water));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .promotional-banner p {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin: 0;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .promotional-banner a:hover {
+            color: #38bdf8 !important;
+        }
+
         footer {
             text-align: center;
             padding: 32px;
             color: var(--text-muted);
             font-size: 13px;
             border-top: 1px solid var(--border);
-            margin-top: 48px;
+            margin-top: 0;
             opacity: 0;
             animation: fadeIn 0.5s ease forwards;
-            animation-delay: 1.3s;
+            animation-delay: 1.5s;
         }
 
         footer a {
@@ -1489,6 +1544,13 @@
                         <div class="construction-note" id="construction-gdp" data-tooltip="Construction + equipment installation over 3 years">0.00% of economy</div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div class="promotional-banner">
+            <div class="banner-content">
+                <h3>Like this dashboard?</h3>
+                <p><a href="https://www.skyislandai.com/contact" target="_blank" style="font-weight: bold; text-decoration: underline; color: var(--accent-water); transition: color var(--transition-fast);">Contact Sky Island AI</a> to request a custom dashboard for your<br>organization or business!</p>
             </div>
         </div>
 
@@ -1919,7 +1981,7 @@
             let postMetaNote = '';
             if (twhPerYear >= 3.95) {
                 preMetaNote = `<span style="color: var(--negative);">Meta's similarly sized campus in Mesa, AZ will require 450&nbsp;MW. <a href="https://azbigmedia.com/business/heres-why-metro-phoenix-has-become-the-data-center-destination/" target="_blank" style="color: #60a5fa;">Source ↗</a> That's almost 4&nbsp;TWh/yr at max capacity (actual annual usage is TBD).</span><br>`;
-                postMetaNote = `<span style="color: var(--negative);">-->Equivalent to TEP's <strong>entire residential population</strong>. <a href="https://www.eia.gov/electricity/sales_revenue_price/pdf/table_6.pdf" target="_blank" style="color: #60a5fa;">Source ↗</a></span><br>`;
+                postMetaNote = `<span style="color: var(--negative);"><em>→ Equivalent to TEP's <strong>entire residential population</strong></em>. <a href="https://www.eia.gov/electricity/sales_revenue_price/pdf/table_6.pdf" target="_blank" style="color: #60a5fa;">Source ↗</a></span><br>`;
             }
            
             document.getElementById('electric-value').innerHTML = `
