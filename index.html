@@ -2045,7 +2045,7 @@
             const localCapture = value * 0.05; // 5% local capture
            
             document.getElementById('equipment-value').innerHTML = `
-                <div class="value-main">${value.toLocaleString()}M in equipment purchases</div>
+                <div class="value-main">$${value.toLocaleString()}M in equipment purchases</div>
                 <div class="value-details">
                     ~${localCapture.toFixed(0)}M stays local during construction (5% capture - installation labor)<br>
                     Tax exemption costs Tucson ${annualAbatement.toFixed(1)}M/year for 20 years (LEED certified)
@@ -2186,7 +2186,7 @@
                     `If water is added to system: ${Math.abs(waterAF).toFixed(0)} AF × $${waterEconomicValue}/AF = $${(Math.abs(waterResourceCost)/1000000).toFixed(2)}M benefit (Note: Project Blue has not yet selected a specific water replenishment method)`);
                 document.getElementById('water-resource').className = 'cost-value positive';
             } else {
-                document.getElementById('water-tax').textContent = '+$' + (waterTaxRevenue/1000).toFixed(0) + 'K';
+                document.getElementById('water-tax').textContent = '+$' + (waterTaxRevenue/1000).toFixed(0) + 'k';
                 document.getElementById('water-tax').setAttribute('data-tooltip',
                     `Formula: $${waterPrice.toFixed(0)}/AF × ${waterAF.toFixed(0)} AF × 2.6% = $${(waterTaxRevenue/1000).toFixed(0)}K`);
                
