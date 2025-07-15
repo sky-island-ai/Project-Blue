@@ -334,7 +334,7 @@
 
         .slider-header {
             display: flex;
-            align-items: center;
+            align-items: flex-start; /* align title with top of badge(s) */
             justify-content: space-between;
             margin-bottom: 24px;
             flex-wrap: wrap;
@@ -423,6 +423,11 @@
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
+        }
+
+        /* Add extra space below the electric slider */
+        #electric-slider-container {
+            margin-bottom: 80px;
         }
 
         .comparison-markers {
@@ -840,7 +845,7 @@
         .share-bar-container::after {
             content: '';
             position: absolute;
-            left: 50%;
+            left: 83.333%; /* Divider at 100% of resource when bar max = 120% */
             top: 0;
             bottom: 0;
             width: 2px;
@@ -1283,6 +1288,13 @@
             outline: 2px solid var(--accent-water);
             outline-offset: 4px;
         }
+
+        /* Group badges vertically in Electric slider header */
+        .badge-column {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
     </style>
 </head>
 <body>
@@ -1344,11 +1356,11 @@
                 </div>
                
                 <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin: 16px 0;">
-                    Project Blue will use potable water for at least the first 2 years, claiming an eventual transition to "100% renewable water resources, primarily reclaimed water" via a new 18-mile pipeline.
+                    Project Blue will use drinking water for the first 2 years, claiming an eventual transition to "100% renewable water resources, primarily reclaimed water" via a new 18-mile pipeline. Most data centers in the U.S. use millions of gallons of potable water, so this claim is difficult to evaluate.
                 </p>
                
                 <div class="slider-container">
-                    <input type="range" class="slider" id="water-slider" min="-0.5" max="4.5" step="0.1" value="2.0">
+                    <input type="range" class="slider" id="water-slider" min="-0.5" max="9" step="0.1" value="4.5">
                     <div class="comparison-markers" id="water-markers"></div>
                 </div>
                 <div class="slider-value" id="water-value"></div>
@@ -1361,10 +1373,13 @@
                         <span class="icon">⚡️</span>
                         <h2>ELECTRIC USE</h2>
                     </div>
-                    <div class="consumption-badge" id="electric-badge" data-tooltip="Percentage of TEP's total annual generation (9.21 TWh/year)">0% of TEP Supply</div>
+                    <div class="badge-column">
+                        <div class="consumption-badge" id="electric-badge" data-tooltip="Percentage of TEP's annual total generation (9.21 TWh/year)">0% of TEP's Total Delivery</div>
+                        <div class="consumption-badge" id="electric-res-badge" data-tooltip="Percentage of TEP's anual residential delivery (3.97 TWh/year)">0% of Residential Delivery</div>
+                    </div>
                 </div>
-                <div class="slider-container">
-                    <input type="range" class="slider" id="electric-slider" min="0.5" max="4" step="0.05" value="2.25">
+                <div class="slider-container" id="electric-slider-container">
+                    <input type="range" class="slider" id="electric-slider" min="1" max="11" step="0.1" value="6">
                     <div class="comparison-markers" id="electric-markers"></div>
                 </div>
                 <div class="slider-value" id="electric-value"></div>
@@ -1488,28 +1503,28 @@
             <div class="share-visualization">
                 <h3 data-tooltip="Project Blue's resource consumption and economic activity as percentage of Tucson totals">SHARE OF LOCAL RESOURCES & ECONOMY</h3>
                 <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px; text-align: center;">
-                    Scale: Bars are scaled 2:1 (full bar = 50% of resource)
+                    Scale: Bars extend to 120% of resource; vertical line marks 100%
                 </p>
                
                 <div class="share-item">
                     <div class="share-header">
-                        <span class="share-label" data-tooltip="Percentage of Tucson Water's total supply">Water Supply</span>
+                        <span class="share-label" data-tooltip="Percentage of Tucson Water's potable delivery">Water Supply</span>
                         <span class="share-percent" id="share-water-percent" style="color: var(--accent-water);">0.00%</span>
                     </div>
                     <div class="share-bar-container">
                         <div class="share-fill water" id="share-water-bar"></div>
-                        <div style="position: absolute; left: 50%; top: -18px; transform: translateX(-50%); font-size: 10px; color: var(--text-muted);">25%</div>
+                        <div style="position: absolute; left: 83.333%; top: -18px; transform: translateX(-50%); font-size: 10px; color: var(--text-muted);">100%</div>
                     </div>
                 </div>
 
                 <div class="share-item">
                     <div class="share-header">
-                        <span class="share-label" data-tooltip="Percentage of TEP's total generation">Electric Supply</span>
+                        <span class="share-label" data-tooltip="Percentage of TEP's total delivery">Electric Supply</span>
                         <span class="share-percent" id="share-electric-percent" style="color: var(--accent-electric);">0.00%</span>
                     </div>
                     <div class="share-bar-container">
                         <div class="share-fill electric" id="share-electric-bar"></div>
-                        <div style="position: absolute; left: 50%; top: -18px; transform: translateX(-50%); font-size: 10px; color: var(--text-muted);">25%</div>
+                        <div style="position: absolute; left: 83.333%; top: -18px; transform: translateX(-50%); font-size: 10px; color: var(--text-muted);">100%</div>
                     </div>
                 </div>
 
@@ -1520,7 +1535,7 @@
                     </div>
                     <div class="share-bar-container">
                         <div class="share-fill economy" id="share-economy-bar"></div>
-                <div style="position: absolute; left: 50%; top: -18px; transform: translateX(-50%); font-size: 10px; color: var(--text-muted);">25%</div>
+                <div style="position: absolute; left: 83.333%; top: -18px; transform: translateX(-50%); font-size: 10px; color: var(--text-muted);">100%</div>
                     </div>
                 </div>
 
@@ -1604,7 +1619,7 @@
                 <li><strong>Potable Economic Value:</strong> $4,500/AF (economic modeling assumption based on: $800/AF new supply cost + $700/AF opportunity cost + $3,000/AF drought resilience value)</li>
                 <li><strong>Tax Rate:</strong> 2.6% (City of Tucson TPT only)</li>
                 <li><strong>Water Supply Baseline:</strong> Tucson Water delivered 78.6 MGD of potable water in 2024 (91.6 MGD total including reclaimed)</li>
-                <li><strong>Note:</strong> Project Blue will use potable water for at least the first 2 years, claiming an eventual transition to "100% renewable water resources, primarily reclaimed water" via a new 18-mile pipeline.</li>
+                <li><strong>Note:</strong> Project Blue will use potable water for the first 2 years, claiming an eventual transition to "100% renewable water resources, primarily reclaimed water" via a new 18-mile pipeline.</li>
             </ul>
            
             <h3>Construction vs. Equipment</h3>
@@ -1640,21 +1655,34 @@
             comparisons: {
                 water: [
                     { label: "Developer Claim", value: -0.1, type: "developer",
-                      tooltip: "Project Blue claims they will transition to being 'water positive', meaning it would return more water to the environment than it uses, after the first 2 years of using potable water. However, they have not yet selected a specific method or water replenishment project." },
+                      tooltip: "Project Blue claims they will transition to being 'water positive', meaning it would return more water to the environment than it uses, after the first 2 years of using potable water. However, they have not yet selected a specific method or water replenishment project.",
+                      source: "https://www.tucsonaz.gov/Government/Office-of-the-City-Manager/Project-Blue-Information" },
                     { label: "Google Mesa (min)", value: 1, type: "benchmark",
                       tooltip: "Guaranteed allowance at Google's Mesa, AZ campus is 1 million gallons per day",
                       source: "https://time.com/5814276/google-data-centers-water/" },
                     { label: "Google Mesa (max)", value: 4, type: "benchmark",
                       tooltip: "Maximum allowance at Google's Mesa, AZ campus is 4 million gallons per day",
-                      source: "https://time.com/5814276/google-data-centers-water/" }
+                      source: "https://time.com/5814276/google-data-centers-water/" },
+                    { label: "Georgia 1", value: 6, type: "benchmark",
+                      tooltip: "Some data centers in Newton County, Georgia, request 6 million gallons per day",
+                      source: "https://www.nytimes.com/2025/07/14/technology/meta-data-center-water.html" },
+                    { label: "Georgia 2", value: 9, type: "benchmark",
+                      tooltip: "A data center in Newton County, Georgia, requested 9 million gallons per day",
+                      source: "https://www.nytimes.com/2025/07/14/technology/meta-data-center-water.html" }
                 ],
                 electric: [
-                    { label: "Meta Texas", value: 1.05, type: "benchmark",
+                    { label: "Meta Texas", value: 1, type: "benchmark",
                       tooltip: "Meta's Fort Worth, TX campus uses a little over 1 TWh/yr. The Los Lunas, NM campus is similar at 1.11 TWh/yr.",
                       source: "https://sustainability.atmeta.com/wp-content/uploads/2024/08/Meta-2024-Sustainability-Report.pdf" },
-                    { label: "Meta Mesa (max)", value: 3.95, type: "benchmark",
-                      tooltip: "Meta's similarly sized campus in Mesa, AZ will require 450&nbsp;MW. <a href=\"https://azbigmedia.com/business/heres-why-metro-phoenix-has-become-the-data-center-destination/\" target=\"_blank\" style=\"color: #60a5fa;\">Source ↗</a> That's almost 4&nbsp;TWh/yr at max capacity (actual annual usage is TBD). That would equal the usage of TEP's <strong>entire residential population</strong>. <a href=\"https://www.eia.gov/electricity/sales_revenue_price/pdf/table_6.pdf\" target=\"_blank\" style=\"color: #60a5fa;\">Source ↗</a>",
-                      source: "https://azbigmedia.com/business/heres-why-metro-phoenix-has-become-the-data-center-destination/" }
+                    { label: "Meta Mesa", value: 2, type: "benchmark",
+                      tooltip: "Meta's similarly sized campus in Mesa, AZ will require 450 MW. Estimating operation at 50% average capacity for a year would be 2 TWh/yr, or <strong>half of Tucson's entire residential usage</strong>.",
+                      source: "https://azbigmedia.com/business/heres-why-metro-phoenix-has-become-the-data-center-destination/" },
+                    { label: "Developer Claim (50%)", value: 5, type: "developer",
+                      tooltip: "Project Blue claims max capacity of 900-1300 MW. Operating at 50% average capacity would be around 5 TWh/yr, more than Tucson's <strong>entire residential population</strong> and <strong>more than half of TEP's entire annual delivery</strong>.",
+                      source: "https://www.tucsonaz.gov/Government/Office-of-the-City-Manager/Project-Blue-Information" },
+                    { label: "Developer Claim (max)", value: 11, type: "developer",
+                      tooltip: "Project Blue claims max capacity of 900-1300 MW. Operating at full capacity would be over 11 TWh/yr, <strong>more than TEP's entire annual delivery</strong> (9.2 TWh). It likely will not operate at full capacity all the time, but we see this as a fair upper end of the estimated range.",
+                      source: "https://www.tucsonaz.gov/Government/Office-of-the-City-Manager/Project-Blue-Information" }
                 ],
                 construction: [
                     { label: "Low", value: 1000, type: "benchmark",
@@ -1989,7 +2017,7 @@
                         Equivalent to ${households.toLocaleString()} households<br>
                         ${(gallonsPerYear/1000000).toFixed(1)} million gallons annually<br>
                         <span style="color: ${percentColor}">
-                            ${percent.toFixed(2)}% of Tucson's potable water delivery
+                            ${percent.toFixed(2)}% of Tucson's potable water delivery <a href="https://www.tucsonaz.gov/News-articles/By-the-Numbers-2024" target="_blank" style="color: #60a5fa;">Source ↗</a>
                         </span>
                     </div>
                 `;
@@ -2003,25 +2031,20 @@
             const households = Math.round(mw * 1000 / 1.1); // ~1.1 kW per household
             const percent = (twhPerYear / CONFIG.tepTotal * 100);
            
-            updateConsumptionBadge('electric-badge', percent, 'TEP Supply');
+            updateConsumptionBadge('electric-badge', percent, 'TEP\'s Total Delivery');
+            updateConsumptionBadge('electric-res-badge', (twhPerYear / 3.967) * 100, 'Residential Delivery');
            
-            let preMetaNote = '';
-            let postMetaNote = '';
-            if (twhPerYear >= 3.95) {
-                preMetaNote = `<span style="color: var(--negative);">Meta's similarly sized campus in Mesa, AZ will require 450&nbsp;MW. <a href="https://azbigmedia.com/business/heres-why-metro-phoenix-has-become-the-data-center-destination/" target="_blank" style="color: #60a5fa;">Source ↗</a> That's almost 4&nbsp;TWh/yr at max capacity (actual annual usage is TBD).</span><br>`;
-                postMetaNote = `<span style="color: var(--negative);"><em>→ Equivalent to TEP's <strong>entire residential population</strong></em>. <a href="https://www.eia.gov/electricity/sales_revenue_price/pdf/table_6.pdf" target="_blank" style="color: #60a5fa;">Source ↗</a></span><br>`;
-            }
+            const residentialPercent = (twhPerYear / 3.967) * 100; // 3.967 TWh/yr = TEP residential delivery
            
             document.getElementById('electric-value').innerHTML = `
-                <div class="value-main">${twhPerYear.toFixed(2)} TWh/year</div>
+                <div class="value-main">${twhPerYear.toFixed(1)} TWh/year</div>
                 <div class="value-details">
-                    ${preMetaNote}
                     Powers equivalent of ${households.toLocaleString()} households<br>
-                    ${postMetaNote}
-                    Equivalent continuous load of ${mw.toFixed(0)} MW<br>
                     <span style="color: ${percent > 20 ? 'var(--danger)' : percent > 10 ? 'var(--warning)' : 'var(--text-muted)'}">
-                        ${percent.toFixed(1)}% of TEP's total generation
-                    </span>
+                        ${percent.toFixed(1)}% of TEP's total delivery <a href="https://www.tep.com/our-energy-mix/" target="_blank" style="color: #60a5fa;">Source ↗</a>
+                    </span><br>
+                    <span style="color: var(--negative);">${residentialPercent.toFixed(1)}% of TEP's residential delivery <a href="https://www.eia.gov/electricity/sales_revenue_price/pdf/table_6.pdf" target="_blank" style="color: #60a5fa;">Source ↗</a></span><br>
+                    Equivalent continuous load of ${mw.toFixed(0)} MW
                 </div>
             `;
         }
@@ -2225,19 +2248,21 @@
             document.getElementById('sticky-electric').textContent = '⚡️️ ' + electricPercent.toFixed(2) + '%';
             document.getElementById('sticky-economy').textContent = '💰 ' + economyPercent.toFixed(3) + '%';
            
-            // Water share - scale to 50% max
+            // Water share - scale to 150% max
+            const scaleFactor = 100 / 120; // full bar = 120% of resource, divider at 100%
+           
+            // Water share - scale to 150% max
             document.getElementById('share-water-percent').textContent =
                 (waterPercent < 0 ? '-' : '') + Math.abs(waterPercent).toFixed(2) + '%';
-            document.getElementById('share-water-bar').style.width = Math.min(Math.max(Math.abs(waterPercent) * 2, 0.2), 100) + '%';
+            document.getElementById('share-water-bar').style.width = Math.min(Math.max(Math.abs(waterPercent) * scaleFactor, 0.2), 100) + '%';
            
-            // Electric share - scale to 50% max
+            // Electric share - scale to 150% max
             document.getElementById('share-electric-percent').textContent = electricPercent.toFixed(2) + '%';
-            document.getElementById('share-electric-bar').style.width = Math.min(Math.max(electricPercent * 2, 0.2), 100) + '%';
+            document.getElementById('share-electric-bar').style.width = Math.min(Math.max(electricPercent * scaleFactor, 0.2), 100) + '%';
            
-            // Economy share - use same scaling as water/electric (2:1)
+            // Economy share - scale similarly
             document.getElementById('share-economy-percent').textContent = economyPercent.toFixed(3) + '%';
-            // Scale: 50% = full bar, so multiply by 2
-            const economyBarWidth = economyPercent * 2;
+            const economyBarWidth = economyPercent * scaleFactor;
             document.getElementById('share-economy-bar').style.width = Math.max(economyBarWidth, 0.2) + '%';
             document.getElementById('economy-fraction').textContent = '$' + (economyPercent * 10).toFixed(2);
            
@@ -2296,8 +2321,8 @@
         }
 
         // Initialize
-        createMarkers('water-markers', CONFIG.comparisons.water, 2.0, {min: -0.5, max: 4.5});
-        createMarkers('electric-markers', CONFIG.comparisons.electric, 2.25, {min: 0.5, max: 4});
+        createMarkers('water-markers', CONFIG.comparisons.water, 4.5, {min: -0.5, max: 9});
+        createMarkers('electric-markers', CONFIG.comparisons.electric, 6, {min: 1, max: 11});
         createMarkers('construction-markers', CONFIG.comparisons.construction, 1750, {min: 1000, max: 2500});
         createMarkers('equipment-markers', CONFIG.comparisons.equipment, 1500, {min: 500, max: 2500});
         const econSliderInit = document.getElementById('economic-slider');
