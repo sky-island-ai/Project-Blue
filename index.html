@@ -1352,7 +1352,7 @@
                         <span class="icon">💧</span>
                         <h2>WATER USE</h2>
                     </div>
-                    <div class="consumption-badge" id="water-badge" data-tooltip="Percentage of Tucson's potable water delivery (78.6 MGD in 2024)">0% of Tucson Potable Water</div>
+                    <div class="consumption-badge" id="water-badge" data-tooltip="Percentage of Tucson's total water supply (91.6 MGD in 2024)">0% of Tucson Water Supply</div>
                 </div>
                
                 <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin: 16px 0;">
@@ -1985,9 +1985,9 @@
             const afPerYear = mgd / 0.00089; // Convert MGD to AF/yr
             const gallonsPerYear = mgd * 365 * 1000000;
             const households = Math.round(Math.abs(mgd) / 0.000185); // ~185 gal per day per household in Tucson and Oro Valley
-            const percent = (mgd / CONFIG.tucsonWaterPotable * 100);
+            const percent = (mgd / CONFIG.tucsonWaterTotal * 100);
            
-            updateConsumptionBadge('water-badge', percent, 'Tucson Potable Water');
+            updateConsumptionBadge('water-badge', percent, 'Tucson Water Supply');
            
             // Calculate color for percentage display
             let percentColor = 'var(--text-muted)';
@@ -2006,18 +2006,18 @@
                         <span style="color: var(--negative);">Project Blue claims they will transition to being 'water positive', meaning it would return more water to the environment than it uses, after the first 2 years of using potable water. However, they have not yet selected a specific method or water replenishment project.</span><br>
                         Equivalent to ${households.toLocaleString()} households worth of water<br>
                         <span style="color: ${percentColor}">
-                            ${Math.abs(percent).toFixed(2)}% addition to Tucson's potable water
+                            ${Math.abs(percent).toFixed(2)}% addition to Tucson's total water supply <a href="https://www.tucsonaz.gov/News-articles/By-the-Numbers-2024" target="_blank" style="color: #60a5fa;">Source ↗</a>
                         </span>
                     </div>
                 `;
             } else {
                 document.getElementById('water-value').innerHTML = `
-                    <div class="value-main">${mgd.toFixed(1)} million gallons per day (MGD) of potable water</div>
+                    <div class="value-main">${mgd.toFixed(1)} million gallons per day (MGD)</div>
                     <div class="value-details">
                         Equivalent to ${households.toLocaleString()} households<br>
                         ${(gallonsPerYear/1000000).toFixed(1)} million gallons annually<br>
                         <span style="color: ${percentColor}">
-                            ${percent.toFixed(2)}% of Tucson's potable water delivery <a href="https://www.tucsonaz.gov/News-articles/By-the-Numbers-2024" target="_blank" style="color: #60a5fa;">Source ↗</a>
+                            ${percent.toFixed(2)}% of Tucson's total water supply <a href="https://www.tucsonaz.gov/News-articles/By-the-Numbers-2024" target="_blank" style="color: #60a5fa;">Source ↗</a>
                         </span>
                     </div>
                 `;
@@ -2236,7 +2236,7 @@
                 `Property tax (0.79% of $${constructionInvestment + equipmentInvestment}M) + other local taxes`);
            
             // Share visualizations
-            const waterPercent = (waterMGD / CONFIG.tucsonWaterPotable * 100);
+            const waterPercent = (waterMGD / CONFIG.tucsonWaterTotal * 100);
             const electricPercent = (twhPerYear / CONFIG.tepTotal * 100);
            
             // Economic activity as direct spending only (not including tax revenue)
