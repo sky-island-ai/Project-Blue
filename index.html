@@ -1324,15 +1324,15 @@
             <p style="text-align: center; margin-bottom: 16px; font-size: 16px; color: var(--text-secondary);"><strong style="color: var(--accent-water);">Adjust sliders below to update</strong></p>
             <div class="share-row">
                 <div class="share-metric">
-                    <div class="share-metric-label">% of Water Supply</div>
+                    <div class="share-metric-label" data-tooltip="Percentage of Tucson Water's total delivery (91.6 MGD in 2024)">% of Water</div>
                     <div class="share-metric-value" id="sticky-water" style="color: var(--accent-water);">💧 0.00%</div>
                 </div>
                 <div class="share-metric">
-                    <div class="share-metric-label">% of Electric Supply</div>
+                    <div class="share-metric-label" data-tooltip="Percentage of TEP's total retail delivery to every home, business, and industrial facility combined (8.96 TWh in 2024)">% of Electricity</div>
                     <div class="share-metric-value" id="sticky-electric" style="color: var(--accent-electric);">⚡️ 0.00%</div>
                 </div>
                 <div class="share-metric">
-                    <div class="share-metric-label">% of Economic Activity</div>
+                    <div class="share-metric-label" data-tooltip="Annual ongoing economic activity as share of Tucson GDP ($62.2B)">% of Economy</div>
                     <div class="share-metric-value" id="sticky-economy" style="color: var(--accent-economy);">💰 0.00%</div>
                 </div>
             </div>
@@ -1352,7 +1352,7 @@
                         <span class="icon">💧</span>
                         <h2>WATER USE</h2>
                     </div>
-                    <div class="consumption-badge" id="water-badge" data-tooltip="Percentage of Tucson's total water supply (91.6 MGD in 2024)">0% of Tucson Water Supply</div>
+                    <div class="consumption-badge" id="water-badge" data-tooltip="Percentage of Tucson's total water delivery (91.6 MGD in 2024)">0% of Tucson Water Delivery</div>
                 </div>
                
                 <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin: 16px 0;">
@@ -1374,8 +1374,8 @@
                         <h2>ELECTRIC USE</h2>
                     </div>
                     <div class="badge-column">
-                        <div class="consumption-badge" id="electric-badge" data-tooltip="Percentage of TEP's annual total generation (9.21 TWh/year)">0% of TEP's Total Delivery</div>
-                        <div class="consumption-badge" id="electric-res-badge" data-tooltip="Percentage of TEP's anual residential delivery (3.97 TWh/year)">0% of Residential Delivery</div>
+                        <div class="consumption-badge" id="electric-badge" data-tooltip="Percentage of TEP's annual total retail delivery to every home, business, and industrial facility combined (8.96 TWh/year)">0% of TEP's Total Retail Delivery</div>
+                        <div class="consumption-badge" id="electric-res-badge" data-tooltip="Percentage of TEP's annual residential delivery (3.96 TWh/year)">0% of TEP's Residential Delivery</div>
                     </div>
                 </div>
                 <div class="slider-container" id="electric-slider-container">
@@ -1508,7 +1508,7 @@
                
                 <div class="share-item">
                     <div class="share-header">
-                        <span class="share-label" data-tooltip="Percentage of Tucson Water's potable delivery">Water Supply</span>
+                        <span class="share-label" data-tooltip="Percentage of Tucson Water's total delivery (91.6 MGD in 2024)">% of Water Delivery</span>
                         <span class="share-percent" id="share-water-percent" style="color: var(--accent-water);">0.00%</span>
                     </div>
                     <div class="share-bar-container">
@@ -1519,7 +1519,7 @@
 
                 <div class="share-item">
                     <div class="share-header">
-                        <span class="share-label" data-tooltip="Percentage of TEP's total delivery">Electric Supply</span>
+                        <span class="share-label" data-tooltip="Percentage of TEP's total retail delivery to every home, business, and industrial facility combined (8.96 TWh in 2024)">% of Retail Electricity Delivery</span>
                         <span class="share-percent" id="share-electric-percent" style="color: var(--accent-electric);">0.00%</span>
                     </div>
                     <div class="share-bar-container">
@@ -1618,7 +1618,7 @@
                 <li><strong>Potable Water Price:</strong> $1,594.30/AF (<a href="https://www.tucsonaz.gov/Departments/Tucson-Water" target="_blank" style="color: #60a5fa;">Tucson Water</a> base industrial rate - excludes summer surcharges)</li>
                 <li><strong>Potable Economic Value:</strong> $4,500/AF (economic modeling assumption based on: $800/AF new supply cost + $700/AF opportunity cost + $3,000/AF drought resilience value)</li>
                 <li><strong>Tax Rate:</strong> 2.6% (City of Tucson TPT only)</li>
-                <li><strong>Water Supply Baseline:</strong> Tucson Water delivered 78.6 MGD of potable water in 2024 (91.6 MGD total including reclaimed)</li>
+                <li><strong>Water Delivery Baseline:</strong> Tucson Water delivered 78.6 MGD of potable water in 2024 (91.6 MGD total including reclaimed)</li>
                 <li><strong>Note:</strong> Project Blue will use potable water for the first 2 years, claiming an eventual transition to "100% renewable water resources, primarily reclaimed water" via a new 18-mile pipeline.</li>
             </ul>
            
@@ -1634,7 +1634,7 @@
             <ul>
                 <li><a href="https://www.tep.com/2023-irp/" target="_blank" style="color: #60a5fa;">TEP 2023 Integrated Resource Plan</a></li>
                 <li><a href="https://www.tep.com/2026-rates/" target="_blank" style="color: #60a5fa;">TEP 2026 Rate Case Filing</a></li>
-                <li><a href="https://www.tep.com/our-energy-mix/" target="_blank" style="color: #60a5fa;">TEP Energy Mix (9.21 TWh delivered in 2024)</a></li>
+                <li><a href="https://www.sec.gov/ix?doc=/Archives/edgar/data/100122/000010012225000004/tep-20241231.htm" target="_blank" style="color: #60a5fa;">SEC 10-K Report showing TEP's total retail delivery in 2024 was 8.96 TWh</a></li>
                 <li><a href="https://tucsononewater.com/wp-content/uploads/2023/10/Tucson-Water-One-Water-2100-Plan_Spreads_Web-Version.pdf" target="_blank" style="color: #60a5fa;">Tucson Water One Water 2100 Plan</a></li>
                 <li><a href="https://time.com/5814276/google-data-centers-water/" target="_blank" style="color: #60a5fa;">Google Mesa Campus Water Agreement (1-4 MGD)</a></li>
                 <li><a href="https://www.lazard.com/media/nltb551p/lazards-lcoeplus-april-2023.pdf" target="_blank" style="color: #60a5fa;">Lazard LCOE Analysis 2023</a></li>
@@ -1678,10 +1678,10 @@
                       tooltip: "Meta's similarly sized campus in Mesa, AZ will require 450 MW. Operating at 50% average capacity would be 2 TWh/yr, or <strong>half of Tucson's entire residential usage</strong>.",
                       source: "https://azbigmedia.com/business/heres-why-metro-phoenix-has-become-the-data-center-destination/" },
                     { label: "Project Blue (midpoint)", value: 5, type: "developer",
-                      tooltip: "Project Blue claims max capacity of 900-1300 MW. Operating at 50% capacity would be 4-6 TWh/yr, more than Tucson's <strong>entire residential population</strong> and more than <strong>half of TEP's entire annual delivery</strong>.",
+                      tooltip: "Project Blue claims max capacity of 900-1300 MW. Operating at 50% capacity would be 4-6 TWh/yr, more than Tucson's <strong>every home in Tucson combined</strong>.",
                       source: "https://www.tucsonaz.gov/Government/Office-of-the-City-Manager/Project-Blue-Information" },
                     { label: "Project Blue (max)", value: 11, type: "developer",
-                      tooltip: "Project Blue claims max capacity of 900-1300 MW. Operating at full capacity would be over 11 TWh/yr, significantly more than <strong>TEP's entire annual delivery</strong> (9.2 TWh). It likely will not operate at max capacity all the time, but even 80% capacity would match TEP's current total delivery.",
+                      tooltip: "Project Blue claims max capacity of 900-1300 MW. Operating at full capacity would be over 11 TWh/yr, more than <strong>TEP's entire retail delivery to every home, business, and industrial facility combined</strong> (8.96 TWh/yr). It likely will not operate at max capacity all the time, but even 80% capacity would exceed TEP's current total retail delivery.",
                       source: "https://www.tucsonaz.gov/Government/Office-of-the-City-Manager/Project-Blue-Information" }
                 ],
                 construction: [
@@ -1744,7 +1744,7 @@
             tucsonGDP: 62.2, // billion dollars
             tucsonWaterPotable: 78.6, // MGD potable water delivered in 2024
             tucsonWaterTotal: 91.6, // MGD total including reclaimed
-            tepTotal: 9.21  // TWh/year
+            tepTotal: 8.96  // TWh/year
         };
 
         let tooltip = document.getElementById('tooltip');
@@ -1987,7 +1987,7 @@
             const households = Math.round(Math.abs(mgd) / 0.000185); // ~185 gal per day per household in Tucson and Oro Valley
             const percent = (mgd / CONFIG.tucsonWaterTotal * 100);
            
-            updateConsumptionBadge('water-badge', percent, 'Tucson Water Supply');
+            updateConsumptionBadge('water-badge', percent, 'Tucson Water Delivery');
            
             // Calculate color for percentage display
             let percentColor = 'var(--text-muted)';
@@ -2017,7 +2017,7 @@
                         Equivalent to ${households.toLocaleString()} households<br>
                         ${(gallonsPerYear/1000000).toFixed(1)} million gallons annually<br>
                         <span style="color: ${percentColor}">
-                            ${percent.toFixed(2)}% of Tucson's total water supply <a href="https://www.tucsonaz.gov/News-articles/By-the-Numbers-2024" target="_blank" style="color: #60a5fa;">Source ↗</a>
+                            ${percent.toFixed(2)}% of Tucson's total water delivery <a href="https://www.tucsonaz.gov/News-articles/By-the-Numbers-2024" target="_blank" style="color: #60a5fa;">Source ↗</a>
                         </span>
                     </div>
                 `;
@@ -2031,17 +2031,17 @@
             const households = Math.round(mw * 1000 / 1.1); // ~1.1 kW per household
             const percent = (twhPerYear / CONFIG.tepTotal * 100);
            
-            updateConsumptionBadge('electric-badge', percent, 'TEP\'s Total Delivery');
-            updateConsumptionBadge('electric-res-badge', (twhPerYear / 3.967) * 100, 'Residential Delivery');
+            updateConsumptionBadge('electric-badge', percent, 'TEP\'s Total Retail Delivery');
+            updateConsumptionBadge('electric-res-badge', (twhPerYear / 3.964) * 100, 'TEP\'s Residential Delivery');
            
-            const residentialPercent = (twhPerYear / 3.967) * 100; // 3.967 TWh/yr = TEP residential delivery
+            const residentialPercent = (twhPerYear / 3.964) * 100; // 3.964 TWh/yr = TEP residential delivery
            
             document.getElementById('electric-value').innerHTML = `
                 <div class="value-main">${twhPerYear.toFixed(1)} TWh/year</div>
                 <div class="value-details">
                     Powers equivalent of ${households.toLocaleString()} households<br>
                     <span style="color: ${percent > 20 ? 'var(--danger)' : percent > 10 ? 'var(--warning)' : 'var(--text-muted)'}">
-                        ${percent.toFixed(1)}% of TEP's total delivery <a href="https://www.tep.com/our-energy-mix/" target="_blank" style="color: #60a5fa;">Source ↗</a>
+                        ${percent.toFixed(1)}% of TEP's total retail delivery <a href="https://www.tep.com/our-energy-mix/" target="_blank" style="color: #60a5fa;">Source ↗</a>
                     </span><br>
                     <span style="color: var(--negative);">${residentialPercent.toFixed(1)}% of TEP's residential delivery <a href="https://www.eia.gov/electricity/sales_revenue_price/pdf/table_6.pdf" target="_blank" style="color: #60a5fa;">Source ↗</a></span><br>
                     Equivalent continuous load of ${mw.toFixed(0)} MW
